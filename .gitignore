@@ -33,4 +33,4 @@ __pycache__/
 migrations/
 
 # db file
-.db
+*.db
