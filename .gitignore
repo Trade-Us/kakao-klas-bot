@@ -29,5 +29,10 @@ __pycache__/
 # C extensions
 *.so
 
-# DB
-*.db
+
+# Migration File
+migrations/
+
+# db file
+.db
+>>>>>>> 41a2bf3794bba211faf5cf90c79d59086b428a3c
