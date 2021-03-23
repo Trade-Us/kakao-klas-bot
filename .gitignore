@@ -34,5 +34,4 @@ __pycache__/
 migrations/
 
 # db file
-.db
->>>>>>> 41a2bf3794bba211faf5cf90c79d59086b428a3c
+*.db
