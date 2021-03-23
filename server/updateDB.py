@@ -23,18 +23,19 @@ def add_Assignment(title, startDate, endDate, submit, subjectID):
     db_session.commit()
 def delete_Assignment(title, startDate, endDate, submit, subjectID):
 
-def add_Notice(data):
-    title=data[1]
-    writer=data[3]
-    date=data[4]
-    contents=""
-    serialNum=data[0]
-    subjectID=""
 
-    notice=Notice(title, writer,date, contents, serialNum, subjectID)
-    db_session.add(notice)
-    db_session.commit()
+def add_Notice(lists):
+    for data in lists:
+        title=data[1]
+        writer=data[3]
+        date=data[4]
+        contents=""
+        serialNum=data[0]
+        subjectID=""
 
+        notice=Notice(title, writer,date, contents, serialNum, subjectID)
+        db_session.add(notice)
+        db_session.commit()
 def delete_Notice(title, writer,date, contents, serialNum, subjectID):
 
 def add_OnlineLecture(startDate, endDate, progress, contents, week, episode, subjectID):
