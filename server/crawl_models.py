@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime , Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from database import Base
+from server.database import Base
 
 class IDWithSubject(Base):
     __tablename__ = 'id_with_subject'
