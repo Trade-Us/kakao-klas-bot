@@ -38,7 +38,7 @@ def add_Notice(lists):
     for data in lists:
         title=data[1]
         writer=data[3]
-        date=data[4]
+        date=datetime.strptime(data[4], '%Y-%m-%d')
         contents=""
         serialNum=data[0]
         subjectID=""
