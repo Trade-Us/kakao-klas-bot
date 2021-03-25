@@ -1,8 +1,6 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker
-from server.models import User, IDWithSubject, Subject, Assignment,Notice, OnlineLecture
+from server.models import User, IDWithSubject, Subject, Assignment, Notice, OnlineLecture
 
 engine = create_engine('sqlite:///information.db', echo=True)
 Session = sessionmaker(bind=engine)
