@@ -1,13 +1,8 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from server.models import User, IDWithSubject, Subject, Assignment, Notice, OnlineLecture
-
-engine = create_engine('sqlite:///information.db', echo=True)
-Session = sessionmaker(bind=engine)
-session = Session()
+from database import db_session
 
 def read_User():
-    users = session.query(User).order_by(User.ID)
+    users = db_session.query(User).order_by(User.ID)
     user_lists=[]
     for user in users:
         user_set=[user.ID, user.Name, user.Password]
