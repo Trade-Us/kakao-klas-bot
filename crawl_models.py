@@ -37,7 +37,7 @@ class Subject(Base):
         self.ID = ID
         self.Name = Name
         self.Professor = Professor
-        self.Name = Name
+        self.Schedule = Schedule
     def __repr__(self):
         return "<Subject('%s', '%s', '%s', '%s')>" %(self.ID, self.Name, self.Professor, self.Name)
 

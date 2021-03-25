@@ -1,3 +1,6 @@
+from database import db_session 
+from crawl_models import User, Subject, IDWithSubject, Assignment, OnlineLecture, Notice
+
 def add_IDWithSubject(crawling):
     data=IDWithSubject(crawling[0], crawling[1])
     db_session.add(data)
