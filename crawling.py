@@ -2,6 +2,8 @@ from database import init_db
 from database import db_session 
 from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
 
+
+
 def main():
     add_IDWithSubject("2018203039", "sdh9606")
     add_IDWithSubject("2018203040", "sdh960")
