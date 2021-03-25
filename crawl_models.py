@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime , Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from server.database import Base
+from database import Base
 
 class IDWithSubject(Base):
     __tablename__ = 'id_with_subject'
@@ -37,7 +37,7 @@ class Subject(Base):
         self.ID = ID
         self.Name = Name
         self.Professor = Professor
-        self.Name = Name
+        self.Schedule = Schedule
     def __repr__(self):
         return "<Subject('%s', '%s', '%s', '%s')>" %(self.ID, self.Name, self.Professor, self.Name)
 

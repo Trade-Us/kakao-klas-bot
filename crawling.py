@@ -1,7 +1,7 @@
 from database import init_db 
 from database import db_session 
 from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
-
+from updateDB import add_Assignment, add_IDWithSubject, add_Notice, add_OnlineLecture, add_Subject, add_User
 
 
 def main():
