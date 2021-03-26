@@ -252,8 +252,9 @@ def printDatas(datas):
             print(data)
 def main():
     
-#     infoList = read_User()
-    infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
+    infoList = read_User()
+    print(infoList)
+#     infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
 
     thread_list = []
     
@@ -265,8 +266,8 @@ def main():
     
     for t in thread_list:
         notices = t.join()
-        printDatas(notices)
-#         add_Notice(notices)
+#         printDatas(notices)
+        add_Notice(notices[0])
         
     
     # 앞으로 해야 할 일
