@@ -10,19 +10,16 @@ from bs4 import BeautifulSoup
 import time, threading
 from datetime import datetime
 
-from database import init_db 
-from database import db_session 
-from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
 
 class MyThreadDriver(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         options = webdriver.ChromeOptions()
-        options.add_argument("headless")
+#         options.add_argument("headless")
         #options.add_argument("disable-gpu")
         #options.add_argument("disable-infobars")
-        options.add_argument("no-sandbox")
-        options.add_argument("disable-dev-shm-usage")
+#         options.add_argument("no-sandbox")
+#         options.add_argument("disable-dev-shm-usage")
         #options.add_argument("enable-experimental-web-platform-features")
         #options.add_argument("default-background-color FFFFFF00")
         self.id = ''
@@ -33,29 +30,19 @@ class MyThreadDriver(threading.Thread):
         self.__driver = webdriver.Chrome(options=options)
         self.__driver.implicitly_wait(10)
         self.__crawling_data = []
-    
+        
     def setCrawlingInfo(self, _id, _pw):
         self.id = _id
         self.pw = _pw
-#         self.subject_name = _subject_name
         
     def printLog(self, string):
         print(threading.currentThread().getName() + string)
 #         pass
-    
     def run(self):
         try:
             self.__driver.get(self.base_url)
             self.accessToLogin()
             self.startCrawling()
-#             self._getIntoSubject()
-            # 온라인 강의 크롤링
-#             self.goToAssignmentPage()
-            # 과제 크롤링
-#             self.__crawling_data.append(self.goToNoticePage())
-            # 공지사항 크롤링
-#             self.goToAttachmentPage()
-            # 첨부자료 크롤링
         except Exception as inst:
             print(inst)
         finally:
@@ -67,7 +54,6 @@ class MyThreadDriver(threading.Thread):
     
     def accessToLogin(self):
         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.ID, "loginId")))
-        #time.sleep(1)
         elemId = self.__driver.find_element_by_id("loginId")
         elemId.send_keys(self.id)
 
@@ -75,122 +61,73 @@ class MyThreadDriver(threading.Thread):
         elemPW.send_keys(self.pw)
         elemPW.send_keys(Keys.ENTER)
         self.printLog("로그인 완료...")
+#         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
         
-    def getIntoSubject(self):
-#         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
-#         self.__driver.find_element_by_css_selector(f"ul.subjectlist > li:nth-child({subject_seq}) > div.left").click()
-        try:
-            WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "btn2")))
-            return self.getDataOnlineLectures()
-        except Exception as inst:
-            print(inst)
-            print("등록된 강의가 없습니다.")
-            return
-    
-    def crawlings(self):
-        datas = []
-        datas.append(self.getIntoSubject())
-        datas.append(self.goToNoticePage())
-        self.__crawling_data.append(datas)
-        self.__driver.get(self.base_url)
-#         print(self.__driver.current_url)
-        self.printLog("모든 페이지(강의, 공지사항) 크롤링 완료")
-
     def startCrawling(self):
-        sub_seq = 1
-        while True:
-            try:
-                WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
-                self.__driver.find_element_by_css_selector(f"ul.subjectlist > li:nth-child({sub_seq}) > div.left").click()
-                sub_seq += 1
-            except Exception as inst:
-                print(inst)
-                print("No More Subject")
-                break
-            self.crawlings()
-            # While True 로 바꾸어서, 과목이 나오지 않을 때까지 한다.
-            
-#     def _getIntoSubject(self):
-#         # 해당 과목 페이지로 진입
-#         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
-#         self.__driver.find_element_by_css_selector("ul.subjectlist > li > div.left").click()
-#         print("Breaking Point 1")
-# #         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
-#         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "btn2")))
-#         print("Breaking Point 2")
-#         for i in range(3):
-#             try:
-#                 option = self.__driver.find_element_by_css_selector("select[name=selectSubj]")
-#                 option.click()
-#                 option.find_element_by_css_selector("option:nth-child(" + str(i+1) + ")").click()
-#                 print("Breaking Point 3")
-# #                 WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "btn2")))
-#                 self.getDataOnlineLectures()
-#                 self.__crawling_data.append(self.goToNoticePage())
-#             except Exception as inst:
-#                 print(inst)
-#                 break
-#             finally:
-#                 self.printLog("모든 페이지 크롤링 완료")
-# #                 self.goToPrevUrl(-2)
-# #                 self.__driver.get('https://klas.kw.ac.kr/')
-# #                 time.sleep(2)
-# #                 print(self.__driver.current_url)
+        self.__crawling_data.append(self.crawlingNoticePage())
+        self.__crawling_data.append(self.crawlingLecturePage())
+        self.printLog("모든 페이지(강의, 공지사항) 크롤링 완료")
+        
+    ##### Menu Button 접근 및 카테고리 페이지 이동 함수 #####
+    def _click_menu_btn(self):
+        self.__driver.find_element_by_css_selector('div.toplogo > button').click()
     
-    # ---- 과제, 공지사항, 등등 페이지로 넘어갈 때에는 크롤링 하기전에만 Wait을 해주면 괜찮다. -----#
-    # -- 뒤로가기 시에는 get 메소드가 아니기 때문에 Explicit Wait 작동 X -- #
-    # 과제 경로 -> 2, 2
-    def goToAssignmentPage(self):
-        ## 과제 제출 페이지까지 가는 경로
-        url = self.getCssSelector(2, 2)
-        self.__driver.find_element_by_css_selector(url).click()
-        
+    def _access_to_certain_page(self, col, category, row):
+        self.__driver\
+        .find_element_by_css_selector\
+        (f'#navbarHeader > div > div > div:nth-child({col}) > ul > li:nth-child({category}) > ul > li:nth-child({row}) > a').click()
+        WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
+    
+    ##### Crawling Notice Functions #####
+    def getDataNotices(self):
+        result = []
+        soup = BeautifulSoup(self.__driver.page_source, 'html.parser')
+        notices = soup.select("#appModule > table > tbody > tr")
+        for notice in notices:
+            notice_info = []
+            titles = notice.select("td")
+            for title in titles:
+                notice_info.append(title.text)
+            result.append(notice_info)
+        return result
+    
+    def accessNoticePage(self):
         try:
-            WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "btn-gray")))
-            self.getDataAssignments()
-        except:
-            pass
-        finally:
-            self.printLog("과제 페이지 완료")
-            self.goToPrevUrl()
-        
-    # 공지사항
-    def goToNoticePage(self):
-        # WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "notice-list")))
-        url = ".notice-list > div.bodtitle > a"
-        self.__driver.find_element_by_css_selector(url).click()
-        
-        try:
-            # Wait Clause
             WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "lft")))
             # 마땅히 할 수 있는 Wqit Tag가 보이지 않는다.
             return self.getDataNotices()
         except Exception as inst:
             print(inst)
-            print("lft tag가 없음")
-        finally:
-            self.printLog("공지사항 페이지 완료")
-            self.goToPrevUrl()
-        #time.sleep(1)
+            print("공지사항이 없습니다.")
         
-    def goToAttachmentPage(self):
-        #WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
-        url = self.getCssSelector(2, 4)
-        self.__driver.find_element_by_css_selector(url).click()
-        self.printLog("강의자료 페이지 접근완료")
-        time.sleep(1)
-        self.goToPrevUrl()
-        #time.sleep(1)
-    
-    def getCssSelector(self, div, li):
-        return ".subjectpresentbox > div.tablelistbox > div > div:nth-child({}) > ul > li:nth-child({}) > a".format(div, li)
-    
-    def goToPrevUrl(self):
-        self.__driver.execute_script("window.history.go(-1)")
+    def crawlingNoticePage(self):
+        self._click_menu_btn()
+        self._access_to_certain_page(2, 1, 2)
         
+        notices = []
+        
+        sub_seq = 1
+        while True:
+            try:
+#                 WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
+                self.__driver.\
+                find_element_by_css_selector(f'#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option:nth-child({sub_seq})').click()
+            except:
+                print("###### NoMoreSubject ######")
+                break
+            finally:
+                notice = self.accessNoticePage()
+                if notice is not None:
+                    notices = notices + notice
+                sub_seq += 1
+                
+            
+        return notices
+    
+    ##### Crawling Online Lectures Functions #####
     def getDataOnlineLectures(self):
         result = []
-        soup = BeautifulSoup(self.__driver.page_source, 'lxml')
+        soup = BeautifulSoup(self.__driver.page_source, 'html.parser')
         lectures = soup.select("#appModule > div:nth-child(2) > div.mt-4.mb-4 > div.tablelistbox > table > tbody > tr")[1:]
 
         for lecture in lectures:
@@ -199,8 +136,40 @@ class MyThreadDriver(threading.Thread):
             for _list in lists:
                 lecture_info.append(_list.text.strip())
             result.append(lecture_info)
-#         print(result)
         return result
+ 
+    def accessLecturePage(self):
+        try:
+            WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "btn2")))
+            return self.getDataOnlineLectures()
+        except Exception as inst:
+            print(inst)
+            print("등록된 강의가 없습니다.")
+            
+    def crawlingLecturePage(self):
+        self._click_menu_btn()
+        self._access_to_certain_page(2, 1, 1)
+        lectures = []
+
+        sub_seq = 1
+        while True:
+            try:
+                # 와우.. implicitly를 사용하는게 정신건강에 좋을 것 같다.
+#                 WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
+                self.__driver.\
+                find_element_by_css_selector(f'#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option:nth-child({sub_seq})').click()
+                sub_seq += 1
+            except:
+                print("###### NoMoreSubject ######")
+                break
+            finally:
+                lecture = self.accessLecturePage()
+                if lecture is not None:
+                    lectures = lectures + lecture
+
+        return lectures       
+   
+    ##### Crawling Assignments Functions #####
     def getDataAssignments(self):
         datas = []
         soup = BeautifulSoup(self.__driver.page_source, 'lxml')
@@ -216,21 +185,40 @@ class MyThreadDriver(threading.Thread):
                 #print(info.text)
                 i += 1
             datas.append(data)
-        print(datas)
-#         return datas
-    def getDataNotices(self):
-        result = []
-        soup = BeautifulSoup(self.__driver.page_source, 'lxml')
-        notices = soup.select("#appModule > table > tbody > tr")
-        for notice in notices:
-            notice_info = []
-            titles = notice.select("td")
-            for title in titles:
-                notice_info.append(title.text)
-            result.append(notice_info)
+            
+        return datas
+    def goToAssignmentPage(self):
+        ## 과제 제출 페이지까지 가는 경로
+        url = self.getCssSelector(2, 2)
+        self.__driver.find_element_by_css_selector(url).click()
         
-#         self.add_Notice(result)
-        return result
+        try:
+            WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "btn-gray")))
+            self.getDataAssignments()
+        except:
+            pass
+        finally:
+            self.printLog("과제 페이지 완료")
+            self.goToPrevUrl()
+        
+   
+    ##### Crawling Lecture Papers Functions #####    
+    def goToAttachmentPage(self):
+        #WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
+        url = self.getCssSelector(2, 4)
+        self.__driver.find_element_by_css_selector(url).click()
+        self.printLog("강의자료 페이지 접근완료")
+        time.sleep(1)
+        self.goToPrevUrl()
+        #time.sleep(1)
+    
+    
+    def goToPrevUrl(self):
+        self.__driver.execute_script("window.history.go(-1)")
+        
+    
+    
+   
     
     def quitDriver(self):
         self.__driver.quit()
@@ -241,6 +229,9 @@ class MyThreadDriver(threading.Thread):
 
         
 from read_db import read_User
+from database import db_session 
+from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
+
 def add_Notice(lists):
     for data in lists:
         title=data[1]
@@ -249,21 +240,16 @@ def add_Notice(lists):
         contents=""
         serialNum=data[0]
         subjectID=""
-
-        notice=Notice(title, writer, date, contents, serialNum, subjectID)
-        db_session.add(notice)
-        db_session.commit()
+        notice = db_session.query(Notice).filter_by(Title=title, SerialNum=serialNum).first()
+        if not notice:
+            notice=Notice(title, writer, date, contents, serialNum, subjectID)
+            db_session.add(notice)
+            db_session.commit()
 def printDatas(datas):
-    for subject in datas:
-        print("######## #########")
-        
-        for category in subject:
-            print(">>")
-            if category is None:
-                print("없음")
-                continue
-            for data in category:
-                print(data)
+    for category in datas:
+        print("######## Category #########")
+        for data in category:
+            print(data)
 def main():
     
 #     infoList = read_User()
@@ -280,8 +266,7 @@ def main():
     for t in thread_list:
         notices = t.join()
         printDatas(notices)
-        print("###############")
-#         add_Notice(notices[0])
+#         add_Notice(notices)
         
     
     # 앞으로 해야 할 일
