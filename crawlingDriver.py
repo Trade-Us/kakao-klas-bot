@@ -15,11 +15,11 @@ class MyThreadDriver(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         options = webdriver.ChromeOptions()
-#         options.add_argument("headless")
+        options.add_argument("headless")
         #options.add_argument("disable-gpu")
         #options.add_argument("disable-infobars")
-#         options.add_argument("no-sandbox")
-#         options.add_argument("disable-dev-shm-usage")
+        options.add_argument("no-sandbox")
+        options.add_argument("disable-dev-shm-usage")
         #options.add_argument("enable-experimental-web-platform-features")
         #options.add_argument("default-background-color FFFFFF00")
         self.id = ''
@@ -79,7 +79,7 @@ class MyThreadDriver(threading.Thread):
         WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
     
     ##### Crawling Notice Functions #####
-    def getDataNotices(self):
+    def getDataNotices(self, sub_id):
         result = []
         soup = BeautifulSoup(self.__driver.page_source, 'html.parser')
         notices = soup.select("#appModule > table > tbody > tr")
@@ -88,14 +88,15 @@ class MyThreadDriver(threading.Thread):
             titles = notice.select("td")
             for title in titles:
                 notice_info.append(title.text)
+            notice_info.append(sub_id)
             result.append(notice_info)
         return result
     
-    def accessNoticePage(self):
+    def accessNoticePage(self, sub_id):
         try:
             WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "lft")))
             # 마땅히 할 수 있는 Wqit Tag가 보이지 않는다.
-            return self.getDataNotices()
+            return self.getDataNotices(sub_id)
         except Exception as inst:
             print(inst)
             print("공지사항이 없습니다.")
@@ -107,16 +108,19 @@ class MyThreadDriver(threading.Thread):
         notices = []
         
         sub_seq = 1
+        sub_id = ''
         while True:
             try:
 #                 WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
-                self.__driver.\
-                find_element_by_css_selector(f'#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option:nth-child({sub_seq})').click()
+                subject = self.__driver.\
+                find_element_by_css_selector(f'#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option:nth-child({sub_seq})')
+                sub_id = subject.text.split()[1].strip('()')
+                subject.click()
             except:
                 print("###### NoMoreSubject ######")
                 break
             finally:
-                notice = self.accessNoticePage()
+                notice = self.accessNoticePage(sub_id)
                 if notice is not None:
                     notices = notices + notice
                 sub_seq += 1
@@ -239,8 +243,8 @@ def add_Notice(lists):
         date=datetime.strptime(data[4], '%Y-%m-%d')
         contents=""
         serialNum=data[0]
-        subjectID=""
-        notice = db_session.query(Notice).filter_by(Title=title, SerialNum=serialNum).first()
+        subjectID= data[6]
+        notice = db_session.query(Notice).filter_by(SerialNum=serialNum, SubjectID=subjectID).first()
         if not notice:
             notice=Notice(title, writer, date, contents, serialNum, subjectID)
             db_session.add(notice)
@@ -266,7 +270,7 @@ def main():
     
     for t in thread_list:
         notices = t.join()
-#         printDatas(notices)
+        printDatas(notices)
         add_Notice(notices[0])
         
     
