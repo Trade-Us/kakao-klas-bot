@@ -29,3 +29,7 @@ __pycache__/
 # C extensions
 *.so
 
+# DB
+*.db
+migrations/
+chromedriver.exe
