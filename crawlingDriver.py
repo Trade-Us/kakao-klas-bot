@@ -15,7 +15,7 @@ class MyThreadDriver(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         options = webdriver.ChromeOptions()
-        options.add_argument("headless")
+        # options.add_argument("headless")
         #options.add_argument("disable-gpu")
         #options.add_argument("disable-infobars")
         options.add_argument("no-sandbox")
@@ -112,9 +112,10 @@ class MyThreadDriver(threading.Thread):
         while True:
             try:
 #                 WebDriverWait(self.__driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
-                subject = self.__driver.\
-                find_element_by_css_selector(f'#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option:nth-child({sub_seq})')
-                sub_id = subject.text.split()[1].strip('()')
+                selectSubj = self.__driver.find_element_by_css_selector(f'#appSelectSubj > div.col-md-7 > div > div.col-9 > select')
+                selectSubj.click()
+                subject = selectSubj.find_element_by_css_selector(f'option:nth-child({sub_seq})')
+                sub_id = subject.text.split()[1]
                 subject.click()
             except:
                 print("###### NoMoreSubject ######")
