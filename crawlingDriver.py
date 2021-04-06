@@ -249,15 +249,14 @@ def main():
 
     for t in thread_list:
         notices = t.join()
-        printDatas(notices)
-        add_Notice(notices[0])
+        while True:
+            if not t.is_alive():
+                printDatas(notices)
+                add_Notice(notices[0])
+                break
 
     # 앞으로 해야 할 일
-    # 1. 한 아이디 당 모든 과목 크롤링
-    # 2. 멀티 쓰레드 는 위와 같이 하자
-    # 3. Notice 예외 처리! primary key 가 같으면 예외 ㄲ
-    # 4. id, pw 본 db에서 받아오는 함수 추가(다혜)
-    # 5. 받아온 정보를 통해 크롤링 ㄲ
+    # 1. 온라인 강의 마지막 부분이 잘 되지 않는다.
 
 
 if __name__ == "__main__":
