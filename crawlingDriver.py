@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
 from database import db_session
+
 from read_db import read_User
+from updateDB import *
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -14,7 +16,6 @@ from bs4 import BeautifulSoup
 import time
 import threading
 from datetime import datetime
-import concurrent.futures
 
 
 class MyThreadDriver(threading.Thread):
@@ -30,7 +31,6 @@ class MyThreadDriver(threading.Thread):
         #options.add_argument("default-background-color FFFFFF00")
         self.id = ''
         self.pw = ''
-        self.subject_name = ''
         self.base_url = 'https://klas.kw.ac.kr/'
         self.delay = 3
         self.driver = webdriver.Chrome(options=options)
@@ -41,14 +41,14 @@ class MyThreadDriver(threading.Thread):
     def setCrawlingPage(self, crawlingPage):
         self.crawlingPage = crawlingPage
 
-    def setCrawlingInfo(self, _id, _pw, crawlingPage):
+    def setCrawlingInfo(self, _id, _pw):
         self.id = _id
         self.pw = _pw
-        self.crawlingPage = crawlingPage
 
     def printLog(self, string):
         print(threading.currentThread().getName() + string)
 #         pass
+    ##### Thread 실행 및 대기 함수 #####
 
     def run(self):
         try:
@@ -64,6 +64,12 @@ class MyThreadDriver(threading.Thread):
         threading.Thread.join(self)
         return self.__crawling_data
 
+    def startCrawling(self):
+        self.__crawling_data.append(self.crawlingNoticePage())
+        self.__crawling_data.append(self.crawlingLecturePage())
+        self.printLog("모든 페이지(강의, 공지사항) 크롤링 완료")
+
+    ##### Klas.kw.ac.kr 접속 및 로그인 #####
     def accessToLogin(self):
         WebDriverWait(self.driver, self.delay).until(
             EC.presence_of_element_located((By.ID, "loginId")))
@@ -76,11 +82,6 @@ class MyThreadDriver(threading.Thread):
         self.printLog("로그인 완료...")
 #         WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
 
-    def startCrawling(self):
-        self.__crawling_data.append(self.crawlingNoticePage())
-        self.__crawling_data.append(self.crawlingLecturePage())
-        self.printLog("모든 페이지(강의, 공지사항) 크롤링 완료")
-
     ##### Menu Button 접근 및 카테고리 페이지 이동 함수 #####
     def _click_menu_btn(self):
         self.driver.find_element_by_css_selector(
@@ -92,6 +93,7 @@ class MyThreadDriver(threading.Thread):
         WebDriverWait(self.driver, self.delay).until(
             EC.presence_of_element_located((By.NAME, "selectSubj")))
 
+    ##### Page 크롤링 기능 함수 #####
     def crawlingNoticePage(self):
         self._click_menu_btn()
         self._access_to_certain_page(2, 1, 2)
@@ -228,23 +230,7 @@ def crawling_online_lecture(page_source, sub_id, online_lecture):
         online_lecture.append(info)
 
 
-def add_Notice(lists):
-    for data in lists:
-        title = data[1]
-        writer = data[3]
-        date = datetime.strptime(data[4], '%Y-%m-%d')
-        contents = ""
-        serialNum = data[0]
-        subjectID = data[6]
-        notice = db_session.query(Notice).filter_by(
-            SerialNum=serialNum, SubjectID=subjectID).first()
-        if not notice:
-            notice = Notice(title, writer, date, contents,
-                            serialNum, subjectID)
-            db_session.add(notice)
-            db_session.commit()
-
-
+### 실행! ###
 def printDatas(datas):
     for category in datas:
         print("######## Category #########")
