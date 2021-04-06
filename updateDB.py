@@ -1,5 +1,6 @@
 from database import db_session
 from crawl_models import User, Subject, IDWithSubject, Assignment, OnlineLecture, Notice
+from datetime import datetime
 
 
 def add_IDWithSubject(crawling):
@@ -9,6 +10,7 @@ def add_IDWithSubject(crawling):
 
 
 def delete_IDWithSubject(userID, subjectID):
+    pass
 
 
 def add_User(name, password):
@@ -18,6 +20,7 @@ def add_User(name, password):
 
 
 def delete_User(name, password):
+    pass
 
 
 def add_Subject(name, professor, schedule):
@@ -27,7 +30,7 @@ def add_Subject(name, professor, schedule):
 
 
 def delete_Subject(name, professor, schedule):
-
+    pass
     # 항목: 'No', '과제제목', '제출기한', '상태', '조회', '공개과제'
 
 
@@ -47,7 +50,7 @@ def add_Assignment(lists):
 
 
 def delete_Assignment(title, startDate, endDate, submit, subjectID):
-
+    pass
     # 항목: '번호', '제목', '파일', '작성자', '작성일', '조회수'
 
 
@@ -69,7 +72,7 @@ def add_Notice(lists):
 
 
 def delete_Notice(title, writer, date, contents, serialNum, subjectID):
-
+    pass
     # 항목: '주차', '회수', '제목', '목차', '학습기간', '[진도율]학습시간', '강의보기'
 
 
@@ -92,3 +95,4 @@ def add_OnlineLecture(lists):
 
 
 def delete_OnlineLecture(startDate, endDate, progress, contents, week, episode, subjectID):
+    pass

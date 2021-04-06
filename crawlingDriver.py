@@ -15,7 +15,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import time
 import threading
-from datetime import datetime
 
 
 class MyThreadDriver(threading.Thread):
@@ -36,12 +35,12 @@ class MyThreadDriver(threading.Thread):
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(10)
         self.__crawling_data = []
-        self.crawlingPage = None
+        self.CrawlingFunction = None
 
-    def setCrawlingPage(self, crawlingPage):
-        self.crawlingPage = crawlingPage
+    def set_crawling_page_function(self, crawling_function):
+        self.CrawlingFunction = crawling_function
 
-    def setCrawlingInfo(self, _id, _pw):
+    def set_crawling_info(self, _id, _pw):
         self.id = _id
         self.pw = _pw
 
@@ -65,8 +64,9 @@ class MyThreadDriver(threading.Thread):
         return self.__crawling_data
 
     def startCrawling(self):
-        self.__crawling_data.append(self.crawlingNoticePage())
-        self.__crawling_data.append(self.crawlingLecturePage())
+        # self.__crawling_data.append(self.crawling_notice_page())
+        # self.__crawling_data.append(self.crawling_online_lecture_page())
+        self.crawling_page()
         self.printLog("모든 페이지(강의, 공지사항) 크롤링 완료")
 
     ##### Klas.kw.ac.kr 접속 및 로그인 #####
@@ -87,58 +87,46 @@ class MyThreadDriver(threading.Thread):
         self.driver.find_element_by_css_selector(
             'div.toplogo > button').click()
 
-    def _access_to_certain_page(self, col, category, row):
+    def _access_to_certain_page(self, tuple):
         self.driver\
-            .find_element_by_css_selector(f'#navbarHeader > div > div > div:nth-child({col}) > ul > li:nth-child({category}) > ul > li:nth-child({row}) > a').click()
+            .find_element_by_css_selector(f'#navbarHeader > div > div > div:nth-child({tuple[0]}) > ul > li:nth-child({tuple[1]}) > ul > li:nth-child({tuple[2]}) > a').click()
         WebDriverWait(self.driver, self.delay).until(
             EC.presence_of_element_located((By.NAME, "selectSubj")))
 
     ##### Page 크롤링 기능 함수 #####
-    def crawlingNoticePage(self):
-        self._click_menu_btn()
-        self._access_to_certain_page(2, 1, 2)
+    def crawling_page(self):
+        for function in crawling_functions:
+            self.set_crawling_page_function(function[0])
 
-        notices = []
+            self._click_menu_btn()
+            self._access_to_certain_page(function[1])
 
-        sub_id = ''
-        subjects = self.driver.find_elements_by_css_selector(
-            '#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option')
-        for subject in subjects:
+            final_result = []
 
-            sub_id = subject.text.split()[1]
-            subject.click()
-            time.sleep(0.5)
-            source = self.driver.page_source
-            notice = []
-            self.crawlingPage(source, sub_id, notice)
+            sub_id = ''
+            subjects = self.driver.find_elements_by_css_selector(
+                '#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option')
 
-            if notice is not None:
-                notices = notices + notice
-        self.setCrawlingPage(crawling_online_lecture)
-        return notices
+            for i, subject in enumerate(subjects):
 
-    def crawlingLecturePage(self):
-        self._click_menu_btn()
-        self._access_to_certain_page(2, 1, 1)
-        lectures = []
-        subjects = self.driver.find_elements_by_css_selector(
-            '#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option')
-        for subject in subjects:
-
-            sub_id = subject.text.split()[1]
-            subject.click()
-            time.sleep(0.5)
-            source = self.driver.page_source
-
-            lecture = []
-            self.crawlingPage(source, sub_id, lecture)
-
-            if lecture is not None:
-                lectures = lectures + lecture
-
-        return lectures
+                sub_id = subject.text.split()[1]
+                subject.click()
+                time.sleep(0.5)
+                source = self.driver.page_source
+                result = []
+                thread = threading.Thread(
+                    target=self.CrawlingFunction, args=(source, sub_id, result))
+                thread.start()
+                while True:
+                    if not thread.is_alive():
+                        if result is not None:
+                            final_result += result
+                        break
+            # time.sleep(0.5)
+            self.__crawling_data.append(final_result)
 
     ##### Crawling Assignments Functions #####
+
     def getDataAssignments(self):
         datas = []
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
@@ -230,7 +218,14 @@ def crawling_online_lecture(page_source, sub_id, online_lecture):
         online_lecture.append(info)
 
 
+crawling_functions = [
+    [crawling_notice, (2, 1, 2)],
+    [crawling_online_lecture, (2, 1, 1)]
+]
+
 ### 실행! ###
+
+
 def printDatas(datas):
     for category in datas:
         print("######## Category #########")
@@ -248,7 +243,7 @@ def main():
 
     for data in infoList:
         myThreadDriver = MyThreadDriver()
-        myThreadDriver.setCrawlingInfo(data[0], data[2], crawling_notice)
+        myThreadDriver.set_crawling_info(data[0], data[2])
         myThreadDriver.start()
         thread_list.append(myThreadDriver)
 
