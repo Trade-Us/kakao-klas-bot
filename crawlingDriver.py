@@ -125,53 +125,7 @@ class MyThreadDriver(threading.Thread):
             # time.sleep(0.5)
             self.__crawling_data.append(final_result)
 
-    ##### Crawling Assignments Functions #####
-
-    def getDataAssignments(self):
-        datas = []
-        soup = BeautifulSoup(self.driver.page_source, 'lxml')
-        assignments = soup.select('div.tablelistbox > table > tbody > tr')
-        for assignment in assignments:
-            infos = assignment.select('td')
-            i = 0
-            data = []
-            for info in infos:
-                if i > 3:
-                    break
-                elif i == 1 or i == 3:
-                    data.append(info.text)
-                # print(info.text)
-                i += 1
-            datas.append(data)
-
-        return datas
-
-    def goToAssignmentPage(self):
-        # 과제 제출 페이지까지 가는 경로
-        url = self.getCssSelector(2, 2)
-        self.driver.find_element_by_css_selector(url).click()
-
-        try:
-            WebDriverWait(self.driver, self.delay).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "btn-gray")))
-            self.getDataAssignments()
-        except:
-            pass
-        finally:
-            self.printLog("과제 페이지 완료")
-            self.goToPrevUrl()
-
-    ##### Crawling Lecture Papers Functions #####
-
-    def goToAttachmentPage(self):
-        #WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
-        url = self.getCssSelector(2, 4)
-        self.driver.find_element_by_css_selector(url).click()
-        self.printLog("강의자료 페이지 접근완료")
-        time.sleep(1)
-        self.goToPrevUrl()
-        # time.sleep(1)
-
+    # Sub Function
     def goToPrevUrl(self):
         self.driver.execute_script("window.history.go(-1)")
 
@@ -182,8 +136,10 @@ class MyThreadDriver(threading.Thread):
         print(threading.currentThread().getName() + " 종료")
         self.driver.close()
 
+## 함수를 따로 두는 이유.. 
+## 클래스의 상속으로 중복 코드를 없애기 위함, 그럼 클래스로 작성해야 하는 거 아닌가?
+## 파이썬에서는 이런식으로도 가능하기 때문에 ㅗ갠찮
 ##### Crawling Notice Functions #####
-
 
 def crawling_notice(page_source, sub_id, notice):
 
@@ -201,7 +157,6 @@ def crawling_notice(page_source, sub_id, notice):
 
 ##### Crawling Online Lectures Functions #####
 
-
 def crawling_online_lecture(page_source, sub_id, online_lecture):
     soup = BeautifulSoup(page_source, 'html.parser')
     datas = soup.select(
@@ -216,6 +171,37 @@ def crawling_online_lecture(page_source, sub_id, online_lecture):
             info.append(title.text.strip())
         info.append(sub_id)
         online_lecture.append(info)
+##### Crawling Assignments Functions #####
+
+def crawling_assignments(page_source, sub_id, assignment):
+
+    soup = BeautifulSoup(page_source, 'lxml')
+    datas = soup.select('div.tablelistbox > table > tbody > tr')
+    for data in datas:
+        info = []
+        titles = data.select('td')
+        i = 0
+        for title in titles:
+            if title.text == "등록된 과제가 없습니다.":
+                return
+            if i > 3:
+                break
+            elif i == 1 or i == 3:
+                info.append(title.text)
+            i += 1
+        info.append(sub_id)
+        assignment.append(info)
+        
+##### Crawling Lecture Papers Functions #####
+
+def crawling_attachments(page_source, sub_id, attachment):
+    #WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "subjectlist")))
+    url = self.getCssSelector(2, 4)
+    self.driver.find_element_by_css_selector(url).click()
+    self.printLog("강의자료 페이지 접근완료")
+    time.sleep(1)
+    self.goToPrevUrl()
+    # time.sleep(1)      
 
 
 crawling_functions = [
@@ -253,6 +239,7 @@ def main():
             if not t.is_alive():
                 printDatas(notices)
                 add_Notice(notices[0])
+                add_OnlineLecture(notices[1])
                 break
 
     # 앞으로 해야 할 일
