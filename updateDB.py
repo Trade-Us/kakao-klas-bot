@@ -79,19 +79,21 @@ def delete_Notice(title, writer, date, contents, serialNum, subjectID):
 def add_OnlineLecture(lists):
     for data in lists:
         progress = data[5]
-        contents = ""
+        contents = data[3]
         week = data[0]
         episode = data[1]
-        subjectID = ""
+        subjectID = data[7]
         # split date into startdate and enddate
         date = data[4].split('~')
-        startDate = datetime.strptime(date[0], '%Y-%m-%d %H:%M:%S')
-        endDate = datetime.strptime(date[1], '%Y-%m-%d %H:%M:%S')
+        startDate = datetime.strptime(date[0].strip(), '%Y-%m-%d %H:%M')
+        endDate = datetime.strptime(date[1].strip(), '%Y-%m-%d %H:%M')
 
-        onlineLecture = OnlineLecture(
-            startDate, endDate, progress, contents, week, episode, subjectID)
-        db_session.add(onlineLecture)
-        db_session.commit()
+        onlineLecture = db_session.query(OnlineLecture).filter_by(Week=week, Episode=episode, SubjectID=subjectID).first()
+        if not onlineLecture:
+            onlineLecture = OnlineLecture(
+                startDate, endDate, progress, contents, week, episode, subjectID)
+            db_session.add(onlineLecture)
+            db_session.commit()
 
 
 def delete_OnlineLecture(startDate, endDate, progress, contents, week, episode, subjectID):
