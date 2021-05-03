@@ -16,10 +16,13 @@ def notice_home():
 def register_signup():
     content = request.get_json()
     print(content)
+    kakaoid = content['userRequest']['user']['id']
+    print(kakaoid)
     content = content['action']
     content = content['params']
     parm_id = content['id']
     parm_password = content['password']
+
     print(parm_id,parm_password)
     dataSend = {
             "version": "2.0",
