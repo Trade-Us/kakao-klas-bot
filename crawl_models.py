@@ -19,10 +19,12 @@ class User(Base):
     ID = Column(String(20), primary_key=True)
     Name = Column(String(20), nullable=False)
     Password = Column(String(20), nullable=False)
-    def __init__(self, ID, Name, Password):
+    UserKey = Column(String(200),nullable=False)
+    def __init__(self, ID, Name, Password,UserKey):
         self.ID = ID
         self.Name = Name
         self.Password = Password
+        self.UserKey = UserKey
     def __repr__(self):
         return "<User('%s', '%s', '%s')>" %(self.ID, self.Name,self.Password)
 
@@ -43,15 +45,15 @@ class Subject(Base):
 
 class Assignment(Base):
     __tablename__ = 'assignment'
-    ID = Column(Integer, primary_key=True)
-    Title = Column(String(50), nullable=False)
+    UserID = Column(String(20), primary_key=True)
+    Title = Column(String(50), nullable=False,primary_key=True)
     StartDate =Column(DateTime(),nullable=False)
     EndDate = Column(DateTime(),nullable=False)
     Submit = Column(Boolean,nullable=False)
-    SubjectID = Column(String(20), ForeignKey('subject.ID', ondelete='CASCADE'),nullable=False)
+    SubjectID = Column(String(20), ForeignKey('subject.ID', ondelete='CASCADE'),nullable=False,primary_key=True)
 
-    def __init__(self, Title, StartDate, EndDate, Submit, SubjectID):
-
+    def __init__(self,UserID, Title, StartDate, EndDate, Submit, SubjectID):
+        self.UserID = UserID
         self.Title = Title
         self.StartDate = StartDate
         self.EndDate = EndDate
@@ -62,13 +64,12 @@ class Assignment(Base):
 
 class Notice(Base):
     __tablename__ = 'notice'
-    ID = Column(Integer, primary_key=True)
-    Title = Column(String(50), nullable=False)
+    Title = Column(String(50), nullable=False,primary_key=True)
     Writer = Column(String(20), nullable=False)
     Date = Column(DateTime(),nullable=False)
     Contents = Column(Text(), nullable=False)
     SerialNum = Column(Integer, nullable=False)
-    SubjectID = Column(String(20), ForeignKey('subject.ID',ondelete='CASCADE'), nullable= False)
+    SubjectID = Column(String(20), ForeignKey('subject.ID',ondelete='CASCADE'), nullable= False,primary_key=True)
 
     def __init__(self, Title, Writer, Date, Contents, SerialNum, SubjectID):
 
@@ -83,17 +84,19 @@ class Notice(Base):
 
 class OnlineLecture(Base):
     __tablename__ = 'online_lecture'
-    ID = Column(Integer, primary_key=True)
+    UserID = Column(String(20),nullable = False,primary_key=True)
+    Title = Column(String(50),nullable = False)
     StartDate = Column(DateTime(),nullable=False)
     EndDate = Column(DateTime(),nullable=False)
     Progress = Column(Integer, nullable=False)
     Contents = Column(Text(), nullable=False)
-    Week = Column(Integer, nullable=False)
-    Episode = Column(Integer, nullable=False)
-    SubjectID = Column(String(20),ForeignKey('subject.ID',ondelete='CASCADE'), nullable = False)
+    Week = Column(Integer, nullable=False,primary_key=True)
+    Episode = Column(Integer, nullable=False,primary_key=True)
+    SubjectID = Column(String(20),ForeignKey('subject.ID',ondelete='CASCADE'), nullable = False,primary_key=True)
 
-    def __init__(self, StartDate, EndDate, Progress, Contents, Week, Episode,SubjectID):
-
+    def __init__(self,UserID, Title,StartDate, EndDate, Progress, Contents, Week, Episode,SubjectID):
+        self.UserID = UserID
+        self.Title = Title
         self.StartDate = StartDate
         self.EndDate = EndDate
         self.Progress = Progress
