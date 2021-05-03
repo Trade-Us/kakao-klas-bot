@@ -34,19 +34,21 @@ def delete_Subject(name, professor, schedule):
     # 항목: 'No', '과제제목', '제출기한', '상태', '조회', '공개과제'
 
 
-def add_Assignment(lists):
+def add_Assignment(userID, lists):
     for data in lists:
         title = data[1]
-        submit = data[3]
-        subjectID = ""
+        submit = True if data[3] == '제출' else False
+        subjectID = data[6]
         # split date into startdate and enddate
         date = data[2].split('~')
-        startDate = datetime.strptime(date[0], '%Y-%m-%d %H:%M:%S')
-        endDate = datetime.strptime(date[1], '%Y-%m-%d %H:%M:%S')
+        startDate = datetime.strptime(date[0].strip(), '%Y-%m-%d %H:%M:%S')
+        endDate = datetime.strptime(date[1].strip(), '%Y-%m-%d %H:%M:%S')
 
-        assignment = Assignment(title, startDate, endDate, submit, subjectID)
-        db_session.add(assignment)
-        db_session.commit()
+        assignment = db_session.query(Assignment).filter_by(UserID=userID, Title=title, SubjectID=subjectID).first()
+        if not assignment:
+            assignment = Assignment(userID, title, startDate, endDate, submit, subjectID)
+            db_session.add(assignment)
+            db_session.commit()
 
 
 def delete_Assignment(title, startDate, endDate, submit, subjectID):
@@ -76,9 +78,10 @@ def delete_Notice(title, writer, date, contents, serialNum, subjectID):
     # 항목: '주차', '회수', '제목', '목차', '학습기간', '[진도율]학습시간', '강의보기'
 
 
-def add_OnlineLecture(lists):
+def add_OnlineLecture(userID, lists):
     for data in lists:
         progress = data[5]
+        title = data[2]
         contents = data[3]
         week = data[0]
         episode = data[1]
@@ -88,10 +91,9 @@ def add_OnlineLecture(lists):
         startDate = datetime.strptime(date[0].strip(), '%Y-%m-%d %H:%M')
         endDate = datetime.strptime(date[1].strip(), '%Y-%m-%d %H:%M')
 
-        onlineLecture = db_session.query(OnlineLecture).filter_by(Week=week, Episode=episode, SubjectID=subjectID).first()
+        onlineLecture = db_session.query(OnlineLecture).filter_by(UserID=userID, Week=week, Episode=episode, SubjectID=subjectID).first()
         if not onlineLecture:
-            onlineLecture = OnlineLecture(
-                startDate, endDate, progress, contents, week, episode, subjectID)
+            onlineLecture = OnlineLecture(userID,title, startDate, endDate, progress, contents, week, episode, subjectID)
             db_session.add(onlineLecture)
             db_session.commit()
 

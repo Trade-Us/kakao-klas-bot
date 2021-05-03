@@ -175,22 +175,18 @@ def crawling_online_lecture(page_source, sub_id, online_lecture):
 
 def crawling_assignments(page_source, sub_id, assignment):
 
-    soup = BeautifulSoup(page_source, 'lxml')
+    soup = BeautifulSoup(page_source, 'html.parser')
     datas = soup.select('div.tablelistbox > table > tbody > tr')
     for data in datas:
         info = []
         titles = data.select('td')
-        i = 0
         for title in titles:
-            if title.text == "등록된 과제가 없습니다.":
+            if title.text == "출제된 레포트가 없습니다.":
                 return
-            if i > 3:
-                break
-            elif i == 1 or i == 3:
-                info.append(title.text)
-            i += 1
-        info.append(sub_id)
-        assignment.append(info)
+            info.append(title.text)
+        if info[0] != "-":
+            info.append(sub_id)
+            assignment.append(info)
         
 ##### Crawling Lecture Papers Functions #####
 
@@ -206,7 +202,8 @@ def crawling_attachments(page_source, sub_id, attachment):
 
 crawling_functions = [
     [crawling_notice, (2, 1, 2)],
-    [crawling_online_lecture, (2, 1, 1)]
+    [crawling_online_lecture, (2, 1, 1)],
+    [crawling_assignments, (2, 1, 6)]
 ]
 
 ### 실행! ###
@@ -221,9 +218,9 @@ def printDatas(datas):
 
 def main():
 
-    infoList = read_User()
-    print(infoList)
-#     infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
+    # infoList = read_User()
+    # print(infoList)
+    infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
 
     thread_list = []
 
@@ -234,12 +231,13 @@ def main():
         thread_list.append(myThreadDriver)
 
     for t in thread_list:
-        notices = t.join()
+        infos = t.join()
         while True:
             if not t.is_alive():
-                printDatas(notices)
-                add_Notice(notices[0])
-                add_OnlineLecture(notices[1])
+                printDatas(infos)
+                add_Notice(infos[0])
+                add_OnlineLecture(t.id, infos[1])
+                add_Assignment(t.id, infos[2])
                 break
 
     # 앞으로 해야 할 일
