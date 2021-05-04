@@ -26,7 +26,7 @@ class User(Base):
         self.Password = Password
         self.UserKey = UserKey
     def __repr__(self):
-        return "<User('%s', '%s', '%s')>" %(self.ID, self.Name,self.Password)
+        return "<User('%s', '%s', '%s', '%s')>" %(self.ID, self.Name,self.Password, self.UserKey)
 
 class Subject(Base):
     __tablename__ = 'subject'
