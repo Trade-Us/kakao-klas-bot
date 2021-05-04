@@ -1,30 +1,87 @@
-from threadclass import MyThreadDriver
+from crawlingDriver import MyThreadDriver
 from database import init_db 
 from database import db_session 
-from crawl_models import User, Subject, IDWithSubject
+from server.models import User, Subject, IDWithSubject
+import time
+from bs4 import BeautifulSoup
 
-def register(id,name,pw):
-    user = db_session.query(User).filter_by(ID=id).first()
+def register_user(parm_id,name,parm_password, kakaoid):
+    # User 중복 확인
+    user = db_session.query(User).filter_by(ID=parm_id).first()
     if not user:
-        u = User(id,name,pw)
-        db_session.add(u)
-        
+        user = User(ID=parm_id,Name="모상일",Password=parm_password, UserKey=kakaoid)
+        db_session.add(user)
+    else:
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "carousel": {
+                            "type" : "basicCard",
+                            "items": [
+                                {
+                                    "title" : "이미 등록된 사용자입니다.",
+                                    "description" : "ㅎㅎ"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+        return -1, dataSend
+    # check_oneId_oneBot = db_session.query(User).filter_by(UserKey=kakaoid).first()
+    # if check_oneId_oneBot:
+    #     dataSend = {
+    #         "version": "2.0",
+    #         "template": {
+    #             "outputs": [
+    #                 {
+    #                     "carousel": {
+    #                         "type" : "basicCard",
+    #                         "items": [
+    #                             {
+    #                                 "title" : "봇에서는 하나의 아이디만 등록 가능합니다.",
+    #                                 "description" : "ㅎㅎ"
+    #                             }
+    #                         ]
+    #                     }
+    #                 }
+    #             ]
+    #         }
+    #     }
+    #     return -1, dataSend
+    # 로그인 시도 (일단 무조건 성공)
     myThreadDriver = MyThreadDriver()
-    myThreadDriver.setCrawlingInfo(id,pw,'운영체제')
-    subjects = myThreadDriver.get_user_subject()
+    myThreadDriver.set_crawling_info(parm_id,parm_password)
+    myThreadDriver.driver.get('https://klas.kw.ac.kr/')
+    myThreadDriver.accessToLogin()
+    # 성공시 register
+    time.sleep(1)
+    soup = BeautifulSoup(myThreadDriver.driver.page_source, 'html.parser')
+    subjects = soup.select("#appModule > div > div:nth-child(1) > div:nth-child(2) > ul > li")
+    
+    # print(subjects)
+    result = []
     for subject in subjects:
+        title = subject.select_one("div.left").text
+        splited = title.split()
+        result.append(splited)
+
+    for subject in result:
         sub = db_session.query(Subject).filter_by(ID=subject[1]).first()
         if not sub:
-            s = Subject(subject[1],subject[0],subject[2],"")
+            s = Subject(ID=subject[1],Name=subject[0],Professor=subject[2],Schedule="")
             db_session.add(s)
                         
-        id_sub_set = db_session.query(IDWithSubject).filter_by(UserID=id,SubjectID=subject[1]).first()
+        id_sub_set = db_session.query(IDWithSubject).filter_by(UserID=parm_id,SubjectID=subject[1]).first()
         if not id_sub_set:
-            id_set = IDWithSubject(id,subject[1])
+            id_set = IDWithSubject(UserID=parm_id,SubjectID=subject[1])
             db_session.add(id_set)
     db_session.commit()
     db_session.close()
-register("2018203039","심다혜","sdh9606^^")
-register("2018203092", "모상일", "tkddlf^^12")
-register("2018203054","김범석","k95198245!")
-register("2018203067", "이원빈", "wbkaist22!")
+    myThreadDriver.closeDriver()
+
+    return 1, result
+    # 실패시 오류 처리

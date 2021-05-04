@@ -7,6 +7,9 @@ from sqlalchemy import and_, or_
 
 bp = Blueprint('register', __name__, url_prefix='/register')
 
+### MSI REVISE ###
+from register import register_user
+### MSI REVISE ###
 
 @bp.route('/')
 def notice_home():
@@ -17,12 +20,23 @@ def register_signup():
     content = request.get_json()
     print(content)
     kakaoid = content['userRequest']['user']['id']
-    print(kakaoid)
+    
     content = content['action']
     content = content['params']
     parm_id = content['id']
     parm_password = content['password']
-
+    name = "모상일"
+    print(parm_id,name,parm_password, kakaoid)
+    ### MSI REVISE ###
+    # 등록
+    ## 해당 봇 key 가입 여부 확인
+    ## 기등록자 여부 확인
+    ## 로그인 정보 확인
+    ## 듣는 과목 크롤링
+    flag, data = register_user(parm_id,name, parm_password, kakaoid)
+    if flag == -1:
+        return data 
+    ### MSI REVISE ###
     print(parm_id,parm_password)
     dataSend = {
             "version": "2.0",
@@ -33,7 +47,7 @@ def register_signup():
                             "type" : "basicCard",
                             "items": [
                                 {
-                                    "title" : "공지사항",
+                                    "title" : "등록되셨습니다",
                                     "description" : "test"
                                 }
                             ]
@@ -42,25 +56,10 @@ def register_signup():
                 ],
                 "quickReplies": [
                     {
-                        "messageText": "운영체제",
+                        "messageText": sub[0],
                         "action": "message",
-                        "label": "운영체제"
-                    },
-                    {
-                        "messageText": "알고리즘",
-                        "action": "message",
-                        "label": "알고리즘"
-                    },
-                    {
-                        "messageText": "캡스톤",
-                        "action": "message",
-                        "label": "캡스톤"
-                    },
-                    {
-                        "messageText": "데이터베이스",
-                        "action": "message",
-                        "label": "데이터베이스"
-                    }
+                        "label": sub[0]
+                    } for sub in data
                 ]
             }
         }

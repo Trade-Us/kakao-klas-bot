@@ -1,3 +1,25 @@
+from abc import ABC, abstractmethod
+from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
+from database import db_session
+
+from read_db import read_User
+from updateDB import *
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+
+from bs4 import BeautifulSoup
+import time
+import threading
+
+# 새로운 크롤링 드라이버가 해야하는 일
+
+## 모든 데이터를 가져올 수 있도록 크롤링 로직을 바꾼다.
+
 class MyThreadDriver(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)

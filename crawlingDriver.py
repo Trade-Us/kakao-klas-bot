@@ -16,6 +16,9 @@ from bs4 import BeautifulSoup
 import time
 import threading
 
+# 테스트 단계에서는, 아이디 등록후, 최근 10개에 대한 정보로 진행하도록 하자
+## 일단 여기에 register함수도 포함해서 작성해 놓는다.
+## 테스트 내용을 넘기고, New User에 대한 크롤링을 구현한다.
 
 class MyThreadDriver(threading.Thread):
     def __init__(self):
@@ -218,9 +221,9 @@ def printDatas(datas):
 
 def main():
 
-    # infoList = read_User()
+    infoList = read_User()
     # print(infoList)
-    infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
+    # infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
 
     thread_list = []
 
@@ -241,7 +244,15 @@ def main():
                 break
 
     # 앞으로 해야 할 일
-    # 1. 온라인 강의 마지막 부분이 잘 되지 않는다.
+    # register 경우, 일단 User의 정보만 (register함수) 통신시의 크롤링했을때, 잘 버티는지 확인하라
+    # 왜냐하면, 로그인이 되는지 확인을 해 보아야 하기 때문이다.
+
+    # 만약 잘 된다면 굳
+    # 안된다면, 과목 정보 가져오는 것을 제외한다.
+
+    # 해결이 되면, 일단 새로운 User 테이블에서 최근10개(현재 드라이버)만 가져올 수 있도록 한다.
+
+    # 이후, 새로운 User에 대해 모든 정보를 얻어오는 크롤링 드라이버를 구현한다.
 
 
 if __name__ == "__main__":
