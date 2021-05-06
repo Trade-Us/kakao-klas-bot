@@ -1,6 +1,6 @@
 from crawl_models import IDWithSubject, User, Subject, Assignment, Notice, OnlineLecture
 from database import db_session
-from read_db import read_User
+from readDB import read_User
 from updateDB import *
 
 from crawlingDriver import MyThreadDriver
