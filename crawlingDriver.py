@@ -109,23 +109,23 @@ class MyThreadDriver(threading.Thread):
             sub_id = ''
             subjects = self.driver.find_elements_by_css_selector(
                 '#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option')
+            final_result = new_user_crawling_page(subjects, final_result, function[0], sub_id, self.driver)
+            # for i, subject in enumerate(subjects):
 
-            for i, subject in enumerate(subjects):
-
-                sub_id = subject.text.split()[1]
-                subject.click()
-                time.sleep(0.5)
-                source = self.driver.page_source
-                result = []
-                thread = threading.Thread(
-                    target=self.CrawlingFunction, args=(source, sub_id, result))
-                thread.start()
-                while True:
-                    if not thread.is_alive():
-                        if result is not None:
-                            final_result += result
-                        break
-            # time.sleep(0.5)
+            #     sub_id = subject.text.split()[1]
+            #     subject.click()
+            #     time.sleep(0.5)
+            #     source = self.driver.page_source
+                # final_result = cur_user_crawling_page(subjects, final_result, function[0], source, sub_id)
+                # result = []
+                # thread = threading.Thread(
+                #     target=self.CrawlingFunction, args=(source, sub_id, result))
+                # thread.start()
+                # while True:
+                #     if not thread.is_alive():
+                #         if result is not None:
+                #             final_result += result
+                #         break
             self.__crawling_data.append(final_result)
 
     # Sub Function
@@ -209,6 +209,51 @@ crawling_functions = [
     [crawling_assignments, (2, 1, 6)]
 ]
 
+#### Crawling Type Function ####
+def new_user_crawling_page(subjects, final_result, CrawlingFunction, sub_id, driver):
+    # source 에서 공지사항, 등에 두가지가 없나 확인한다
+    # 두가지가 있을 경우! 반복문을 통해 전부 크롤링 해온다. 이때는, driver도 같이 넘겨야 함..
+    for i, subject in enumerate(subjects):
+        sub_id = subject.text.split()[1]
+        subject.click()
+        time.sleep(0.5)
+        
+        # 있는지 확인!!!
+        # if class paging typeA in source
+        pages = []
+        try:
+            pages = driver.find_elements_by_css_selector("ul.paging > li")
+        except:
+            # 없음
+            source = driver.page_source 
+            final_result = crawling_page_thread(final_result, CrawlingFunction, source, sub_id)
+        else:
+            # 있음
+            pages = pages[1:-1]
+            for page in pages:
+                page.click()
+                time.sleep(0.5)
+                source = driver.page_source 
+                final_result = crawling_page_thread(final_result, CrawlingFunction, source, sub_id)
+    return final_result
+def cur_user_crawling_page(subjects, final_result, CrawlingFunction, sub_id, driver):
+    for i, subject in enumerate(subjects):
+        sub_id = subject.text.split()[1]
+        subject.click()
+        time.sleep(0.5)
+        source = driver.page_source
+        final_result = crawling_page_thread(final_result, CrawlingFunction, source, sub_id)
+    return final_result
+def crawling_page_thread(final_result, CrawlingFunction, source, sub_id):
+    result = []
+    thread = threading.Thread(
+        target= CrawlingFunction, args=(source, sub_id, result))
+    thread.start()
+    while True:
+        if not thread.is_alive():
+            if result is not None:
+                final_result += result
+            return final_result
 ### 실행! ###
 
 
@@ -244,15 +289,19 @@ def main():
                 break
 
     # 앞으로 해야 할 일
-    # register 경우, 일단 User의 정보만 (register함수) 통신시의 크롤링했을때, 잘 버티는지 확인하라
-    # 왜냐하면, 로그인이 되는지 확인을 해 보아야 하기 때문이다.
-
-    # 만약 잘 된다면 굳
-    # 안된다면, 과목 정보 가져오는 것을 제외한다.
-
-    # 해결이 되면, 일단 새로운 User 테이블에서 최근10개(현재 드라이버)만 가져올 수 있도록 한다.
 
     # 이후, 새로운 User에 대해 모든 정보를 얻어오는 크롤링 드라이버를 구현한다.
+    ## for 문을 입력하자.
+
+    ## Crawling 함수 두개를 하나의 파일에 기록
+    ## Class에서는 바뀌어야 하는 부분만 제외시킨다.
+    ## 위 데이터 스크래핑 함수 또한 다른 파일에서 보관한다.
+    ## 함수들을 클래스의 인자로 전달하여, 원하는 함수들만 사이에 끼어서 돌아갈 수 있도록 하는 것이다!
+
+    ## 최종적으로 두개의 실행파일이 나와야 함
+    ## 클래스파일, 크롤링 함수 파일, 데이터 스크래핑 함수 파일 3개의 부수 파일이 생성!
+
+    # 비번 암호화
 
 
 if __name__ == "__main__":
