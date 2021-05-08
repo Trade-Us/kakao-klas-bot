@@ -42,4 +42,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        while True:
+            main()
+            time.sleep(20)
+    except KeyboardInterrupt:
+        print("Keyborad Interrupt")
+        exit(-1)
+

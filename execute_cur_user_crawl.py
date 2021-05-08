@@ -6,6 +6,7 @@ from updateDB import *
 from crawlingDriver import MyThreadDriver
 from crawling_page import cur_user_crawling_page
 
+import time
 def printDatas(datas):
     for category in datas:
         print("######## Category #########")
@@ -37,7 +38,13 @@ def main():
                 add_OnlineLecture(t.id, infos[1])
                 add_Assignment(t.id, infos[2])
                 break
-
-
 if __name__ == "__main__":
-    main()
+    try:
+        while True:
+            main()
+            time.sleep(3600)
+    except KeyboardInterrupt:
+        print("Keyborad Interrupt")
+        exit(-1)
+
+        
