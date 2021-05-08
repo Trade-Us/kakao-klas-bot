@@ -39,6 +39,7 @@ def main():
                 add_Assignment(t.id, infos[2])
                 break
 if __name__ == "__main__":
+    # 주기 : 1시간
     try:
         while True:
             main()

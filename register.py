@@ -10,7 +10,10 @@ def register_user(parm_id,name,parm_password, kakaoid):
     user = db_session.query(User).filter_by(ID=parm_id).first()
     if not user:
         user = User(ID=parm_id,Name="모상일",Password=parm_password, UserKey=kakaoid)
+        new_user = NewUser(ID=parm_id, Name="모상일", Password=parm_password)
         db_session.add(user)
+        db_session.add(new_user)
+
     else:
         dataSend = {
             "version": "2.0",
@@ -53,8 +56,7 @@ def register_user(parm_id,name,parm_password, kakaoid):
     #     }
     #     return -1, dataSend
     # 로그인 시도 (일단 무조건 성공)
-    myThreadDriver = MyThreadDriver()
-    myThreadDriver.set_crawling_info(parm_id,parm_password)
+    myThreadDriver = MyThreadDriver(parm_id, parm_password, None)
     myThreadDriver.driver.get('https://klas.kw.ac.kr/')
     myThreadDriver.accessToLogin()
     # 성공시 register

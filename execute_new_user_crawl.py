@@ -18,7 +18,7 @@ def main():
     ##### While 무한 루프 돌린다. #####
 
     # 해당 부분 변경 필요! read_new_User()
-    infoList = read_User()
+    infoList = read_NewUser()
     # print(infoList)
     # infoList = [['2018203092', '모상일', 'tkddlf^^12' ]]
 
@@ -42,6 +42,7 @@ def main():
 
 
 if __name__ == "__main__":
+    ## 주기 : 10초.. 짧게
     try:
         while True:
             main()
