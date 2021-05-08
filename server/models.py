@@ -10,6 +10,11 @@ class User(db.Model):
     Password = db.Column(db.String(20), nullable=False)
     UserKey = db.Column(db.String(200), nullable=False)
 
+class NewUser(db.Model):
+    ID = db.Column(db.String(20), primary_key=True)
+    Name = db.Column(db.String(20), nullable=False)
+    Password = db.Column(db.String(20), nullable=False)
+
 class Subject(db.Model):
     ID = db.Column(db.String(20), primary_key=True)
     Name = db.Column(db.String(20), nullable=False)

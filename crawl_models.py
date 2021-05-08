@@ -28,6 +28,18 @@ class User(Base):
     def __repr__(self):
         return "<User('%s', '%s', '%s', '%s')>" %(self.ID, self.Name,self.Password, self.UserKey)
 
+class NewUser(Base):
+    __tablename__ = 'new_user'
+    ID = Column(String(20), primary_key=True)
+    Name = Column(String(20), nullable=False)
+    Password = Column(String(20), nullable=False)
+    def __init__(self, ID, Name, Password):
+        self.ID = ID
+        self.Name = Name
+        self.Password = Password
+    def __repr__(self):
+        return "<User('%s', '%s', '%s')>" %(self.ID, self.Name, self.Password)
+
 class Subject(Base):
     __tablename__ = 'subject'
     ID = Column(String(20), primary_key=True)
