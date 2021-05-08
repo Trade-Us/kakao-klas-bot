@@ -13,14 +13,14 @@ def new_user_crawling_page(subjects, final_result, CrawlingFunction, sub_id, dri
         
         # 있는지 확인!!!
         # if class paging typeA in source
-        pages = []
-        try:
-            pages = driver.find_elements_by_css_selector("ul.paging > li")
-        except:
+        
+        if i != 0:
             # 없음
             source = driver.page_source 
             final_result = crawling_page_thread(final_result, CrawlingFunction, source, sub_id)
         else:
+            pages = []
+            pages = driver.find_elements_by_css_selector("ul.paging > li")
             # 있음
             pages = pages[1:-1]
             for page in pages:
@@ -44,8 +44,7 @@ def crawling_page_thread(final_result, CrawlingFunction, source, sub_id):
     thread = threading.Thread(
         target= CrawlingFunction, args=(source, sub_id, result))
     thread.start()
-    while True:
-        if not thread.is_alive():
-            if result is not None:
-                final_result += result
-            return final_result
+    thread.join()
+    if result :
+        final_result += result
+    return final_result
