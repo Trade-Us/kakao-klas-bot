@@ -1,5 +1,5 @@
 from database import db_session
-from crawl_models import User, Subject, IDWithSubject, Assignment, OnlineLecture, Notice
+from crawl_models import *
 from datetime import datetime
 
 
@@ -13,15 +13,27 @@ def delete_IDWithSubject(userID, subjectID):
     pass
 
 
-def add_User(name, password):
+def add_User(ID):
     data = User(name, password)
     db_session.add(data)
     db_session.commit()
 
 
-def delete_User(name, password):
+def delete_User(ID):
     pass
 
+def add_NewUser(ID):
+    data = User(name, password)
+    db_session.add(data)
+    db_session.commit()
+
+
+def delete_NewUser(ID):
+    if ID == "all":
+        db_session.query(NewUser).delete()
+        db_session.commit()
+    else:
+        pass
 
 def add_Subject(name, professor, schedule):
     data = Subject(name, professor, schedule)

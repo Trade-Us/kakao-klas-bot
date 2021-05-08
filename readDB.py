@@ -11,7 +11,7 @@ def read_User():
     return user_lists
 
 def read_NewUser():
-    users = db_session.query(NewUser).order_by(User.ID)
+    users = db_session.query(NewUser).order_by(NewUser.ID)
     user_lists=[]
     for user in users:
         user_set=[user.ID, user.Name, user.Password]

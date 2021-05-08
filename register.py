@@ -1,7 +1,7 @@
 from crawlingDriver import MyThreadDriver
 from database import init_db 
 from database import db_session 
-from server.models import User, Subject, IDWithSubject
+from server.models import User, Subject, IDWithSubject, NewUser
 import time
 from bs4 import BeautifulSoup
 
