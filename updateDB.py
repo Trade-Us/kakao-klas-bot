@@ -73,11 +73,11 @@ def add_Notice(lists):
         title = data[1]
         writer = data[3]
         date = datetime.strptime(data[4], '%Y-%m-%d')
-        contents = ""
-        serialNum = data[0]
-        subjectID = data[6]
+        contents = data[6]
+        serialNum = int(data[0])
+        subjectID = data[7]
         notice = db_session.query(Notice).filter_by(
-            SerialNum=serialNum, SubjectID=subjectID).first()
+            Title=title, SubjectID=subjectID).first()
         if not notice:
             notice = Notice(title, writer, date, contents,
                             serialNum, subjectID)

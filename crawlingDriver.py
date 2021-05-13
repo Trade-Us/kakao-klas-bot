@@ -16,7 +16,7 @@ class MyThreadDriver(threading.Thread):
     def __init__(self, _id, _pw, crawling_page_function):
         threading.Thread.__init__(self)
         options = webdriver.ChromeOptions()
-        # options.add_argument("headless")
+        options.add_argument("headless")
         # options.add_argument("disable-gpu")
         # options.add_argument("disable-infobars")
         options.add_argument("no-sandbox")
@@ -102,7 +102,7 @@ class MyThreadDriver(threading.Thread):
                 '#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option')
 
             # 여기를 dynamic (new, cur)
-            final_result = self.CrawlingPageFunction(subjects, final_result, function[0], sub_id, self.driver)
+            final_result = self.CrawlingPageFunction(len(subjects), final_result, function[0], function[2], sub_id, self.driver)
             
             self.__crawling_data.append(final_result)
 

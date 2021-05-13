@@ -4,21 +4,37 @@ from bs4 import BeautifulSoup
 ## 클래스의 상속으로 중복 코드를 없애기 위함, 그럼 클래스로 작성해야 하는 거 아닌가?
 ## 파이썬에서는 이런식으로도 가능하기 때문에 ㅗ갠찮
 ##### Crawling Notice Functions #####
-
-def crawling_notice(page_source, sub_id, notice):
-
-    soup = BeautifulSoup(page_source, 'html.parser')
-    datas = soup.select("#appModule > table > tbody > tr")
-    for data in datas:
+import time
+from category_enum import *
+def crawling_notice(driver, sub_id, notice):
+    notices = driver.find_elements_by_css_selector("#appModule > table > tbody > tr")
+    if notices[0].text == "글이 없습니다.":
+        print("글이 없음 ")
+        return
+        # continue
+    for i in range(len(notices)):
         info = []
-        titles = data.select("td")
-        for title in titles:
-            if title.text == "글이 없습니다.":
-                return
-            info.append(title.text)
+        # title, date, writer, serialNum
+        sub_infos = driver.find_elements_by_css_selector(f"#appModule > table > tbody > tr:nth-child({(i+1)}) > td")
+        
+        for sub_info in sub_infos:
+            if sub_info.text:
+                info.append(sub_info.text)
+            else :
+                info.append('-1')
+
+        contents_link = sub_infos[1]
+        #contents
+        contents_link.click()
+        time.sleep(0.5)
+        soup = BeautifulSoup( driver.page_source, 'html.parser')
+        contents = soup.select_one('div.board_viewDetail > div').get_text()
+        info.append(contents)
         info.append(sub_id)
         notice.append(info)
-
+        driver.find_element_by_css_selector("button.btn2").click()
+        time.sleep(0.5)
+        
 ##### Crawling Online Lectures Functions #####
 
 def crawling_online_lecture(page_source, sub_id, online_lecture):
@@ -65,7 +81,7 @@ def crawling_attachments(page_source, sub_id, attachment):
 
 
 crawling_functions = [
-    [crawling_notice, (2, 1, 2)],
-    [crawling_online_lecture, (2, 1, 1)],
-    [crawling_assignments, (2, 1, 6)]
+    [crawling_notice, (2, 1, 2), NOTICE],
+    # [crawling_online_lecture, (2, 1, 1)],
+    # [crawling_assignments, (2, 1, 6)]
 ]
