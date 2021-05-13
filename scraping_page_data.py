@@ -82,6 +82,6 @@ def crawling_attachments(page_source, sub_id, attachment):
 
 crawling_functions = [
     [crawling_notice, (2, 1, 2), NOTICE],
-    # [crawling_online_lecture, (2, 1, 1)],
-    # [crawling_assignments, (2, 1, 6)]
+    [crawling_online_lecture, (2, 1, 1), ONLINE_LECTURE],
+    [crawling_assignments, (2, 1, 6), ASSIGNMENT]
 ]
