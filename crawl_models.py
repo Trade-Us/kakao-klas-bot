@@ -80,19 +80,17 @@ class Notice(Base):
     Writer = Column(String(20), nullable=False)
     Date = Column(DateTime(),nullable=False)
     Contents = Column(Text(), nullable=False)
-    SerialNum = Column(Integer, nullable=False)
     SubjectID = Column(String(20), ForeignKey('subject.ID',ondelete='CASCADE'), nullable= False,primary_key=True)
 
-    def __init__(self, Title, Writer, Date, Contents, SerialNum, SubjectID):
+    def __init__(self, Title, Writer, Date, Contents, SubjectID):
 
         self.Title = Title
         self.Writer = Writer
         self.Date = Date
         self.Contents = Contents
-        self.SerialNum = SerialNum
         self.SubjectID = SubjectID
     def __repr__(self):
-        return "<Assignment('%d', '%s', '%s', '%s', '%s', '%d', '%s')>" %(self.ID, self.Title, self.Writer, str(self.Date), str(self.Contents),self.SerialNum,self.SubjectID)
+        return "<Assignment('%d', '%s', '%s', '%s', '%s', '%s')>" %(self.ID, self.Title, self.Writer, str(self.Date), str(self.Contents),self.SubjectID)
 
 class OnlineLecture(Base):
     __tablename__ = 'online_lecture'

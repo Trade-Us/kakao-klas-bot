@@ -34,7 +34,6 @@ class Notice(db.Model):
     Writer = db.Column(db.String(20), nullable=False)
     Date = db.Column(db.DateTime(),nullable=False)
     Contents = db.Column(db.Text(), nullable=False)
-    SerialNum = db.Column(db.Integer, nullable=False)
     SubjectID = db.Column(db.String(20), db.ForeignKey('subject.ID',ondelete='CASCADE'), nullable= False,primary_key=True)
 
 class OnlineLecture(db.Model):
