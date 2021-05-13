@@ -133,37 +133,89 @@ def subjectName_notice_recent():
     content = content['params']
     parm_subjectName = content['subjectName']
     
+    user = User.query.fiter_by(UserKey=kakaoid).first()
+
+    if not user:
+        return -1
+    user_id = user.ID
+    
+    subject_id = Subject.query.filter_by(Name=parm_subjectName)
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id,SubjectID=subject_id)
+
+    notice_list = Notice.query.filter(or_(
+        Notice.SubjectID == f"{subject_list[i].SubjectID}"
+        for i in range(len(subject_list))
+        )
+    ).order_by(Notice.Date.desc())[:5]
+
+    notice_name = []
+    for notice in notice_list:
+        subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
+
+        notice_name.append([subject_name,notice.Title,notice.Contents])
     
     dataSend = {
-            "version": "2.0",
-            "template": {
-                "outputs": [
-                    {
-                        "basicCard": {
-                        #   "title": "보물상자",
-                        "description": "등록이 성공적으로 완료되었습니다.\n\n메뉴를 선택해주세요",
-                        "buttons": [
-                            {
-                            "action": "message",
-                            "label": "내 현황 보기",
-                            "messageText": "아직 블록 연결 안함"
-                            },
-                            {
-                            "action":  "message",
-                            "label": "과목 별 확인",
-                            "messageText": "아직 블록 연결 안함"
-                            },
-                            {
-                            "action": "message",
-                            "label": "홈페이지 공지사항",
-                            "messageText": "아직 블록 연결 안함"
-                            }
-                        ]
-                        }
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                    
+                        "text": f"{notice[1]}\n\n{notice[2]}",
+                    
                     }
-                ]
-            }
+                } for notice in notice_name                
+
+            ]
         }
+    }
+
+    return jsonify(dataSend)
+
+@bp.route('/notice_keyword', methods=['POST'])
+def subjectName_notice_keyword():
+    content = request.get_json()
+    print(content)
+    kakaoid = content['userRequest']['user']['id']
+    
+    content = content['action']
+    content = content['params']
+    parm_subjectName = content['subjectName']
+    parm_keyword = content['keyword']
+    
+    user = User.query.fiter_by(UserKey=kakaoid).first()
+
+    if not user:
+        return -1
+    user_id = user.ID
+    
+    subject_id = Subject.query.filter_by(Name=parm_subjectName)
+
+    notice_list = Notice.query.filter_by(SubjectID=subject_id)
+    for notice in notice_list:
+        print(notice)      
+        if parm_keyword in notice.Title:
+            notice_name = []
+            subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
+            notice_name.append([subject_name,notice.Title,notice.Contents])
+
+    
+    dataSend = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                    
+                        "text": f"{notice[1]}\n\n{notice[2]}",
+                    
+                    }
+                } for notice in notice_name                
+
+            ]
+        }
+    }
+
     return jsonify(dataSend)
 
 @bp.route('/subject', methods=['POST'])

@@ -91,8 +91,6 @@ def notice_keyword():
                 for subject_info in subject_info_list:
                     subject_name = subject_info.Name
                 notice_name += subject_name + " : "+notice.Title + "\n"
-            
-        
 
     dataSend = {
             "version": "2.0",
