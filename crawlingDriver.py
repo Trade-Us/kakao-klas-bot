@@ -72,7 +72,7 @@ class MyThreadDriver(threading.Thread):
         elemPW.send_keys(self.pw)
         elemPW.send_keys(Keys.ENTER)
         self.printLog("로그인 완료...")
-#         WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
+        WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
 
     ##### Menu Button 접근 및 카테고리 페이지 이동 함수 #####
     def _click_menu_btn(self):
