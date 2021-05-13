@@ -4,13 +4,16 @@ from database import db_session
 from server.models import User, Subject, IDWithSubject, NewUser
 import time
 from bs4 import BeautifulSoup
+from crypto_function import SymmetricKeyAgent
 
 def register_user(parm_id,name,parm_password, kakaoid):
     # User 중복 확인
     user = db_session.query(User).filter_by(ID=parm_id).first()
     if not user:
-        user = User(ID=parm_id,Name="모상일",Password=parm_password, UserKey=kakaoid)
-        new_user = NewUser(ID=parm_id, Name="모상일", Password=parm_password)
+        keyAgent = SymmetricKeyAgent()
+        cipher_pw = keyAgent.encrypt(parm_password)
+        user = User(ID=parm_id,Name="모상일",Password=cipher_pw, UserKey=kakaoid)
+        new_user = NewUser(ID=parm_id, Name="모상일", Password=cipher_pw)
         db_session.add(user)
         db_session.add(new_user)
 
