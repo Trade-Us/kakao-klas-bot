@@ -17,20 +17,7 @@ def new_user_crawling_page(subjects_length, final_result, CrawlingFunction, cate
         
         # page가 여러개 인 경우 vs 단일 페이지 경우
         if category == NOTICE:
-            pages = driver.find_elements_by_css_selector("ul.paging > li")
-            # 있음
-            pages_length = len(pages)-2
-            for i in range(pages_length):
-                page = driver.find_element_by_css_selector(f"ul.paging > li:nth-child({(i+2)})")
-                page.click()
-                time.sleep(0.5)
-                # 한번더 들어가는 경우 driver vs source
-                if category == NOTICE:
-                    final_result = crawling_page_thread(final_result, CrawlingFunction, driver, sub_id)
-                else:
-                    source = driver.page_source 
-                    final_result = crawling_page_thread(final_result, CrawlingFunction, source, sub_id)
-
+            final_result = crawling_page_thread(final_result, CrawlingFunction, driver, sub_id)
         else:
             # 없음
             source = driver.page_source 

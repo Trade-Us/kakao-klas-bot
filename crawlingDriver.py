@@ -16,7 +16,7 @@ class MyThreadDriver(threading.Thread):
     def __init__(self, _id, _pw, crawling_page_function):
         threading.Thread.__init__(self)
         options = webdriver.ChromeOptions()
-        options.add_argument("headless")
+        # options.add_argument("headless")
         # options.add_argument("disable-gpu")
         # options.add_argument("disable-infobars")
         options.add_argument("no-sandbox")
@@ -26,7 +26,7 @@ class MyThreadDriver(threading.Thread):
         self.id = _id
         self.pw = _pw
         self.base_url = 'https://klas.kw.ac.kr/'
-        self.delay = 3
+        self.delay = 1
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(10)
         self.__crawling_data = []
@@ -72,7 +72,12 @@ class MyThreadDriver(threading.Thread):
         elemPW.send_keys(self.pw)
         elemPW.send_keys(Keys.ENTER)
         self.printLog("로그인 완료...")
-        WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
+        # try:
+        # WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
+        # except :
+        #     return False
+        # else :
+        #     return True
 
     ##### Menu Button 접근 및 카테고리 페이지 이동 함수 #####
     def _click_menu_btn(self):

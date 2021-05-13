@@ -6,33 +6,64 @@ from bs4 import BeautifulSoup
 ##### Crawling Notice Functions #####
 import time
 from category_enum import *
+
+def crawl_detail_notice(source, info):
+    soup = BeautifulSoup(source, 'html.parser')
+    # 데이터 먼저 크롤링 
+    title = soup.select_one("div.board_view_header > h2").text
+    sub = soup.select_one("div.board_view_header > div").get_text()\
+    .replace("작성자 : ", '').replace("등록일 :", '').replace("조회수 :", '').split()
+    writer = sub[0]
+    date = f"{sub[1]} {sub[2]}"
+    contents = soup.select_one('div.board_viewDetail > div').get_text()
+    for entity in [title, writer, date, contents]:
+        info.append(entity)
+    # 이전 글 존재 여부 체크
+    prev_notice = soup.select_one("#appModule > div.next_prev_box > dl:nth-child(1) > dd")
+    print(prev_notice.text)
+    return True if prev_notice.text.strip() == "이전글이 없습니다." else False 
+
 def crawling_notice(driver, sub_id, notice):
     notices = driver.find_elements_by_css_selector("#appModule > table > tbody > tr")
     if notices[0].text == "글이 없습니다.":
-        print("글이 없음 ")
+        # print("글이 없음 ")
         return
         # continue
+    start_crawl_notice = ''
+    # 중요 표시 확인 로직
     for i in range(len(notices)):
+        star_notice = driver.find_elements_by_css_selector(f"#appModule > table > tbody > tr:nth-child({(i+1)}) > td")
+        no_star = star_notice[0].text
+        link = star_notice[1]
+        if no_star :
+            # 중요 표시 아닌 경우, 그만
+            start_crawl_notice = link # 중요 표시 그 다음 notice를 저장
+            break
+        else:
+            info = []
+            # 중요 표시 인 경우, 들어가서 해당 데이터 담는다.
+            link.click()
+            time.sleep(0.5)
+            crawl_detail_notice(driver.page_source, info)
+            info.append(sub_id)
+            notice.append(info)
+            driver.find_element_by_css_selector("button.btn2").click()
+            time.sleep(0.5)
+    # 나머지 데이터 크롤링
+    # 시작 할 페이지 입장
+    start_crawl_notice.click()
+    time.sleep(0.5)
+    # 반복 ; until 이전 글이 없습니다.
+    while True:
         info = []
-        # title, date, writer, serialNum
-        sub_infos = driver.find_elements_by_css_selector(f"#appModule > table > tbody > tr:nth-child({(i+1)}) > td")
-        
-        for sub_info in sub_infos:
-            if sub_info.text:
-                info.append(sub_info.text)
-            else :
-                info.append('-1')
-
-        contents_link = sub_infos[1]
-        #contents
-        contents_link.click()
-        time.sleep(0.5)
-        soup = BeautifulSoup( driver.page_source, 'html.parser')
-        contents = soup.select_one('div.board_viewDetail > div').get_text()
-        info.append(contents)
+        # 데이터 크롤링
+        prev_page_not_exist = crawl_detail_notice(driver.page_source, info)
         info.append(sub_id)
         notice.append(info)
-        driver.find_element_by_css_selector("button.btn2").click()
+        if prev_page_not_exist:
+            # 이전 페이지 없음  
+            break 
+        driver.find_element_by_css_selector("#appModule > div.next_prev_box > dl:nth-child(1) > dd").click()
         time.sleep(0.5)
         
 ##### Crawling Online Lectures Functions #####
