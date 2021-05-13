@@ -37,3 +37,7 @@ migrations/
 *.db
 
 *.exe
+
+# Keys
+keystore/
+.key
