@@ -66,12 +66,10 @@ def register_user(parm_id,name,parm_password, kakaoid):
     myThreadDriver.driver.get('https://klas.kw.ac.kr/')
     myThreadDriver.accessToLogin()
     # 성공시 register
-    # time.sleep(1)
-
+    time.sleep(2)
     soup = BeautifulSoup(myThreadDriver.driver.page_source, 'html.parser')
     subjects = soup.select("#appModule > div > div:nth-child(1) > div:nth-child(2) > ul > li")
-
-    # 빈 subjects -> 로그인 실패
+    # 실패시 succeed = false
     if not subjects:
         # 로그인 실패한 경우
         dataSend = {
@@ -93,7 +91,8 @@ def register_user(parm_id,name,parm_password, kakaoid):
             }
         }
         return -1, dataSend
-    print(subjects)
+    
+    # print(subjects)
     result = []
     for subject in subjects:
         title = subject.select_one("div.left").text
@@ -116,3 +115,5 @@ def register_user(parm_id,name,parm_password, kakaoid):
 
     return 1, result
     # 실패시 오류 처리
+# _, v = register_user("2018203092", "df", "tkddlf^^12", "sdf")
+# print(v)
