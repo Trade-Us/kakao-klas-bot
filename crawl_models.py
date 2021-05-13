@@ -18,7 +18,7 @@ class User(Base):
     __tablename__ = 'user'
     ID = Column(String(20), primary_key=True)
     Name = Column(String(20), nullable=False)
-    Password = Column(String(20), nullable=False)
+    Password = Column(String(100), nullable=False)
     UserKey = Column(String(200),nullable=False)
     def __init__(self, ID, Name, Password,UserKey):
         self.ID = ID
@@ -32,7 +32,7 @@ class NewUser(Base):
     __tablename__ = 'new_user'
     ID = Column(String(20), primary_key=True)
     Name = Column(String(20), nullable=False)
-    Password = Column(String(20), nullable=False)
+    Password = Column(String(100), nullable=False)
     def __init__(self, ID, Name, Password):
         self.ID = ID
         self.Name = Name
