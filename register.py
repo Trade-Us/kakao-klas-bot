@@ -4,17 +4,22 @@ from database import db_session
 from server.models import User, Subject, IDWithSubject, NewUser
 import time
 from bs4 import BeautifulSoup
+from crypto_function import SymmetricKeyAgent
 
 def register_user(parm_id,name,parm_password, kakaoid):
+
     # User 중복 확인
     user = db_session.query(User).filter_by(ID=parm_id).first()
     if not user:
-        user = User(ID=parm_id,Name="모상일",Password=parm_password, UserKey=kakaoid)
-        new_user = NewUser(ID=parm_id, Name="모상일", Password=parm_password)
+        keyAgent = SymmetricKeyAgent()
+        cipher_pw = keyAgent.encrypt(parm_password)
+        user = User(ID=parm_id,Name="모상일",Password=cipher_pw, UserKey=kakaoid)
+        new_user = NewUser(ID=parm_id, Name="모상일", Password=cipher_pw)
         db_session.add(user)
         db_session.add(new_user)
 
     else:
+        # User가 이미 등록되어 있는 경우
         dataSend = {
             "version": "2.0",
             "template": {
@@ -36,6 +41,7 @@ def register_user(parm_id,name,parm_password, kakaoid):
         return -1, dataSend
     # check_oneId_oneBot = db_session.query(User).filter_by(UserKey=kakaoid).first()
     # if check_oneId_oneBot:
+    #   #카카오톡 2개 이상 id를 등록 하려 하는 경우
     #     dataSend = {
     #         "version": "2.0",
     #         "template": {
@@ -60,9 +66,31 @@ def register_user(parm_id,name,parm_password, kakaoid):
     myThreadDriver.driver.get('https://klas.kw.ac.kr/')
     myThreadDriver.accessToLogin()
     # 성공시 register
-    time.sleep(1)
+    time.sleep(2)
     soup = BeautifulSoup(myThreadDriver.driver.page_source, 'html.parser')
     subjects = soup.select("#appModule > div > div:nth-child(1) > div:nth-child(2) > ul > li")
+    # 실패시 succeed = false
+    if not subjects:
+        # 로그인 실패한 경우
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "carousel": {
+                            "type" : "basicCard",
+                            "items": [
+                                {
+                                    "title" : "로그인 실패!",
+                                    "description" : "ID PW 확인해주세요.."
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+        return -1, dataSend
     
     # print(subjects)
     result = []
@@ -87,3 +115,5 @@ def register_user(parm_id,name,parm_password, kakaoid):
 
     return 1, result
     # 실패시 오류 처리
+# _, v = register_user("2018203092", "df", "tkddlf^^12", "sdf")
+# print(v)

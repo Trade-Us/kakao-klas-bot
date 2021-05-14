@@ -26,7 +26,7 @@ class MyThreadDriver(threading.Thread):
         self.id = _id
         self.pw = _pw
         self.base_url = 'https://klas.kw.ac.kr/'
-        self.delay = 3
+        self.delay = 1
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(10)
         self.__crawling_data = []
@@ -72,7 +72,12 @@ class MyThreadDriver(threading.Thread):
         elemPW.send_keys(self.pw)
         elemPW.send_keys(Keys.ENTER)
         self.printLog("로그인 완료...")
-#         WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
+        # try:
+        # WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
+        # except :
+        #     return False
+        # else :
+        #     return True
 
     ##### Menu Button 접근 및 카테고리 페이지 이동 함수 #####
     def _click_menu_btn(self):
@@ -102,7 +107,7 @@ class MyThreadDriver(threading.Thread):
                 '#appSelectSubj > div.col-md-7 > div > div.col-9 > select > option')
 
             # 여기를 dynamic (new, cur)
-            final_result = self.CrawlingPageFunction(subjects, final_result, function[0], sub_id, self.driver)
+            final_result = self.CrawlingPageFunction(len(subjects), final_result, function[0], function[2], sub_id, self.driver)
             
             self.__crawling_data.append(final_result)
 

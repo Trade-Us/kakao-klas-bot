@@ -70,17 +70,15 @@ def delete_Assignment(title, startDate, endDate, submit, subjectID):
 
 def add_Notice(lists):
     for data in lists:
-        title = data[1]
-        writer = data[3]
-        date = datetime.strptime(data[4], '%Y-%m-%d')
-        contents = ""
-        serialNum = data[0]
-        subjectID = data[6]
+        title = data[0]
+        writer = data[1]
+        date = datetime.strptime(data[2], '%Y-%m-%d %H:%M')
+        contents = data[3]
+        subjectID = data[4]
         notice = db_session.query(Notice).filter_by(
-            SerialNum=serialNum, SubjectID=subjectID).first()
+            Title=title, SubjectID=subjectID).first()
         if not notice:
-            notice = Notice(title, writer, date, contents,
-                            serialNum, subjectID)
+            notice = Notice(title, writer, date, contents, subjectID)
             db_session.add(notice)
             db_session.commit()
 

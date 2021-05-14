@@ -7,6 +7,7 @@ from updateDB import *
 from crawlingDriver import MyThreadDriver
 from crawling_page import new_user_crawling_page
 
+from crypto_function import SymmetricKeyAgent
 import time
 def printDatas(datas):
     for category in datas:
@@ -28,7 +29,8 @@ def main():
         thread_list = []
 
         for data in infoList:
-            myThreadDriver = MyThreadDriver(data[0], data[2], new_user_crawling_page)
+            keyAgent = SymmetricKeyAgent()
+            myThreadDriver = MyThreadDriver(data[0], keyAgent.decrypt(data[2]), new_user_crawling_page)
             #myThreadDriver.set_crawling_info(data[0], data[2])
             myThreadDriver.start()
             thread_list.append(myThreadDriver)
