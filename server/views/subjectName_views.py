@@ -133,18 +133,18 @@ def subjectName_notice_recent():
     content = content['params']
     parm_subjectName = content['subjectName']
     
-    user = User.query.fiter_by(UserKey=kakaoid).first()
+    user = User.query.filter_by(UserKey=kakaoid).first()
 
     if not user:
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName)
-    subject_list = IDWithSubject.query.filter_by(UserID=user_id,SubjectID=subject_id)
-
+    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #subject_list = IDWithSubject.query.filter_by(SubjectID=subject_id).all()
+    print("\nlog:",subject_id)
     notice_list = Notice.query.filter(or_(
-        Notice.SubjectID == f"{subject_list[i].SubjectID}"
-        for i in range(len(subject_list))
+        Notice.SubjectID == f"{subject_id}"
+        
         )
     ).order_by(Notice.Date.desc())[:5]
 
@@ -183,13 +183,13 @@ def subjectName_notice_keyword():
     parm_subjectName = content['subjectName']
     parm_keyword = content['keyword']
     
-    user = User.query.fiter_by(UserKey=kakaoid).first()
+    user = User.query.filter_by(UserKey=kakaoid).first()
 
     if not user:
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName)
+    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
 
     notice_list = Notice.query.filter_by(SubjectID=subject_id)
     for notice in notice_list:
@@ -224,12 +224,7 @@ def register_subject():
     print(content)
     kakaoid = content['userRequest']['user']['id']
     
-    content = content['action']
-    content = content['params']
-    parm_id = content['id']
-    parm_password = content['password']
-    name = "모상일"
-    print(parm_id,name,parm_password, kakaoid)
+    
     dataSend = {
             "version": "2.0",
             "template": {

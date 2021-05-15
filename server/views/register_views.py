@@ -11,7 +11,7 @@ bp = Blueprint('register', __name__, url_prefix='/register')
 from register import register_user
 ### MSI REVISE ###
 
-@bp.route('/')
+@bp.route('/',methods=['POST'])
 def register_home():
     content = request.get_json()
     print(content)
