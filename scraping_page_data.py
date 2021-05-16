@@ -88,16 +88,20 @@ def crawling_assignments(page_source, sub_id, assignment):
 
     soup = BeautifulSoup(page_source, 'html.parser')
     datas = soup.select('div.tablelistbox > table > tbody > tr')
-    for data in datas:
-        info = []
+    info = []
+    for i, data in enumerate(datas):
         titles = data.select('td')
-        for title in titles:
-            if title.text == "출제된 레포트가 없습니다.":
-                return
-            info.append(title.text)
-        if info[0] != "-":
+        if i % 2 == 0:
+            info.clear()
+            for title in titles:
+                if title.text == "출제된 레포트가 없습니다.":
+                    return
+                info.append(title.text)
+        else:
+            info.append(titles[0].text)
             info.append(sub_id)
             assignment.append(info)
+
         
 ##### Crawling Lecture Papers Functions #####
 

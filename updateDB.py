@@ -73,15 +73,14 @@ def delete_Subject(name, professor, schedule):
 
 def add_Assignment(userID, lists):
     for data in lists:
-        if len(data) <= 3:
-            continue 
         title = data[1]
         submit = True if data[3] == '제출' else False
-        subjectID = data[6]
+        subjectID = data[7]
         # split date into startdate and enddate
-        date = data[2].split('~')
+        date = data[2] if data[6] == '-' else data[6]
         startDate = datetime.strptime(date[0].strip(), '%Y-%m-%d %H:%M:%S')
         endDate = datetime.strptime(date[1].strip(), '%Y-%m-%d %H:%M:%S')
+        
 
         assignment = db_session.query(Assignment).filter_by(UserID=userID, Title=title, SubjectID=subjectID).first()
         if not assignment:
@@ -89,6 +88,7 @@ def add_Assignment(userID, lists):
             db_session.add(assignment)
         else:
             assignment.Submit = submit
+            assignment.StartDate = startDate
             assignment.EndDate = endDate
         db_session.commit()
 
