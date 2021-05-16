@@ -3,7 +3,7 @@ from crawl_models import *
 from datetime import datetime
 
 
-def add_IDWithSubject(crawling):
+def add_IDWithSubject(lists):
     data = IDWithSubject(crawling[0], crawling[1])
     db_session.add(data)
     db_session.commit()
@@ -13,19 +13,41 @@ def delete_IDWithSubject(userID, subjectID):
     pass
 
 
-def add_User(ID):
-    data = User(name, password)
-    db_session.add(data)
-    db_session.commit()
+def add_User(lists):
+    for data in lists:
+        _id = data[0]
+        name = data[1]
+        password = data[2]
+        kakaoid = data[3]
+
+        user = db_session.query(User).filter_by(ID=_id).first()
+        if not user:
+            user = User(_id, name, password, kakaoid)
+            db_session.add(user)
+            db_session.commit()
 
 
 def delete_User(ID):
-    pass
+    if ID == "all":
+        db_session.query(User).delete()
+        db_session.commit()
+    else:
+        for _id in ID:
+            db_session.query(User).filter_by(ID=_id[0]).delete()
+            db_session.commit()
 
-def add_NewUser(ID):
-    data = User(name, password)
-    db_session.add(data)
-    db_session.commit()
+def add_NewUser(lists):
+    for data in lists:
+        _id = data[0]
+        name = data[1]
+        password = data[2]
+        kakaoid = data[3]
+
+        user = db_session.query(NewUser).filter_by(ID=_id).first()
+        if not user:
+            user = NewUser(_id, name, password, kakaoid)
+            db_session.add(user)
+            db_session.commit()
 
 
 def delete_NewUser(ID):
@@ -33,7 +55,10 @@ def delete_NewUser(ID):
         db_session.query(NewUser).delete()
         db_session.commit()
     else:
-        pass
+        for _id in ID:
+            db_session.query(NewUser).filter_by(ID=_id[0]).delete()
+            db_session.commit()
+        
 
 def add_Subject(name, professor, schedule):
     data = Subject(name, professor, schedule)
@@ -62,8 +87,10 @@ def add_Assignment(userID, lists):
         if not assignment:
             assignment = Assignment(userID, title, startDate, endDate, submit, subjectID)
             db_session.add(assignment)
-            db_session.commit()
-
+        else:
+            assignment.Submit = submit
+            assignment.EndDate = endDate
+        db_session.commit()
 
 def delete_Assignment(title, startDate, endDate, submit, subjectID):
     pass
@@ -82,8 +109,10 @@ def add_Notice(lists):
         if not notice:
             notice = Notice(title, writer, date, contents, subjectID)
             db_session.add(notice)
-            db_session.commit()
-
+        else:
+            notice.Title = title
+            notice.Contents = contents
+        db_session.commit()
 
 def delete_Notice(title, writer, date, contents, serialNum, subjectID):
     pass
@@ -107,8 +136,9 @@ def add_OnlineLecture(userID, lists):
         if not onlineLecture:
             onlineLecture = OnlineLecture(userID,title, startDate, endDate, progress, contents, week, episode, subjectID)
             db_session.add(onlineLecture)
-            db_session.commit()
-
+        else:
+            onlineLecture.Progress = progress
+        db_session.commit()
 
 def delete_OnlineLecture(startDate, endDate, progress, contents, week, episode, subjectID):
     pass
