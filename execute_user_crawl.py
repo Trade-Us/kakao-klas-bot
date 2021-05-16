@@ -2,7 +2,7 @@ from readDB import read_User, read_NewUser
 from updateDB import *
 
 from crawlingDriver import MyThreadDriver
-from crawling_page import cur_user_crawling_page, new_user_crawling_page
+from crawling_page import user_crawling_page
 
 from crypto_function import SymmetricKeyAgent
 import time, threading
@@ -17,7 +17,7 @@ def execute_crawl(infoList):
 
     for data in infoList:
         keyAgent = SymmetricKeyAgent()
-        myThreadDriver = MyThreadDriver(data[0], keyAgent.decrypt(data[2]), cur_user_crawling_page)
+        myThreadDriver = MyThreadDriver(data[0], keyAgent.decrypt(data[2]), user_crawling_page)
         myThreadDriver.start()
         thread_list.append(myThreadDriver)
 
