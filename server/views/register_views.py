@@ -49,9 +49,9 @@ def register_home():
                             "messageText": "아직 블록 연결 안함"
                             },
                             {
-                            "action":  "message",
+                            "action":  "block",
                             "label": "과목 별 확인",
-                            "messageText": "아직 블록 연결 안함"
+                            "blockId": "6087e7fdc87b900e56c62ba6"
                             },
                             {
                             "action": "message",

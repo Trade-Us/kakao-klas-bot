@@ -48,6 +48,8 @@ def delete_Subject(name, professor, schedule):
 
 def add_Assignment(userID, lists):
     for data in lists:
+        if len(data) <= 3:
+            continue 
         title = data[1]
         submit = True if data[3] == '제출' else False
         subjectID = data[6]
