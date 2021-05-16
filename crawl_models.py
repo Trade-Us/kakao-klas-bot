@@ -33,12 +33,14 @@ class NewUser(Base):
     ID = Column(String(20), primary_key=True)
     Name = Column(String(20), nullable=False)
     Password = Column(String(100), nullable=False)
-    def __init__(self, ID, Name, Password):
+    UserKey = Column(String(200),nullable=False)
+    def __init__(self, ID, Name, Password,UserKey):
         self.ID = ID
         self.Name = Name
         self.Password = Password
+        self.UserKey = UserKey
     def __repr__(self):
-        return "<User('%s', '%s', '%s')>" %(self.ID, self.Name, self.Password)
+        return "<User('%s', '%s', '%s', '%s')>" %(self.ID, self.Name,self.Password, self.UserKey)
 
 class Subject(Base):
     __tablename__ = 'subject'
@@ -72,7 +74,7 @@ class Assignment(Base):
         self.Submit = Submit
         self.SubjectID = SubjectID
     def __repr__(self):
-        return "<Assignment('%d', '%s', '%s', '%s', '%s', '%s')>" %(self.ID, self.Title, str(self.StartDate), str(self.EndDate), str(self.Submit),self.SubjectID)
+        return "<Assignment('%s', '%s', '%s', '%s', '%s', '%s')>" %(self.UserID, self.Title, str(self.StartDate), str(self.EndDate), str(self.Submit),self.SubjectID)
 
 class Notice(Base):
     __tablename__ = 'notice'
@@ -90,7 +92,7 @@ class Notice(Base):
         self.Contents = Contents
         self.SubjectID = SubjectID
     def __repr__(self):
-        return "<Assignment('%d', '%s', '%s', '%s', '%s', '%s')>" %(self.ID, self.Title, self.Writer, str(self.Date), str(self.Contents),self.SubjectID)
+        return "<Assignment('%s', '%s', '%s', '%s', '%s')>" %(self.Title, self.Writer, str(self.Date), str(self.Contents),self.SubjectID)
 
 class OnlineLecture(Base):
     __tablename__ = 'online_lecture'
@@ -115,4 +117,4 @@ class OnlineLecture(Base):
         self.Episode = Episode
         self.SubjectID = SubjectID
     def __repr__(self):
-        return "<OnlineLecture('%d', '%s', '%s', '%d', '%s', '%d', '%d', '%s')>" %(self.ID, str(self.StartDate), str(self.EndDate), self.progress, str(self.Contents),self.Week,self.Episode,self.SubjectID)
+        return "<OnlineLecture('%s', '%s', '%s', '%s', '%d', '%s', '%d', '%d', '%s')>" %(self.UserID, self.Title, str(self.StartDate), str(self.EndDate), self.Progress, str(self.Contents),self.Week,self.Episode,self.SubjectID)
