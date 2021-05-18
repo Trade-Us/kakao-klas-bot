@@ -111,9 +111,9 @@ def subjectName_home():
                             "description": f"이 중 하나를 정확하게 입력해주세요.\n\n{des}",
                             "buttons": [
                                 {
-                                "action": "message",
+                                "action": "block",
                                 "label": "다시 입력",
-                                "messageText": "아직 블록 연결 안함"
+                                "blockId": "6087e7fdc87b900e56c62ba6"
                                 }
                             ]
                             }
@@ -146,8 +146,8 @@ def subjectName_notice_recent():
         Notice.SubjectID == f"{subject_id}"
         
         )
-    ).order_by(Notice.Date.desc())[:5]
-
+    ).order_by(Notice.Date.desc())[:3]
+    print(notice_list)
     notice_name = []
     for notice in notice_list:
         subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
@@ -192,10 +192,12 @@ def subjectName_notice_keyword():
     subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
 
     notice_list = Notice.query.filter_by(SubjectID=subject_id)
+    notice_name = [] 
     for notice in notice_list:
-        print(notice)      
+        print(notice)
+             
         if parm_keyword in notice.Title:
-            notice_name = []
+            
             subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
             notice_name.append([subject_name,notice.Title,notice.Contents])
 
