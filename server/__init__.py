@@ -16,10 +16,10 @@ def create_app():
 
     from . import models
 
-    from .views import assignment_views, notice_views, onlinelecture_views, register_views,subjectName_views
-    app.register_blueprint(assignment_views.bp)
-    app.register_blueprint(notice_views.bp)
-    app.register_blueprint(onlinelecture_views.bp)
+    from .views import register_views,subjectName_views,test_views,mypage_views
     app.register_blueprint(register_views.bp)
     app.register_blueprint(subjectName_views.bp)
+    app.register_blueprint(test_views.bp)
+    app.register_blueprint(mypage_views.bp)
+
     return app
