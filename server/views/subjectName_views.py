@@ -20,12 +20,36 @@ def subjectName_home():
     content = content['action']
     content = content['params']
     parm_subjectName = content['subjectName']
-
+    count = 0
     user_list = User.query.filter_by(UserKey=kakaoid)
+    
+
     for user in user_list:
         print(user.ID)
         user_id = user.ID
-    
+        count +=1
+    if count == 0:
+        dataSend = {
+                "version": "2.0",
+                "template": {
+                    "outputs": [
+                        {
+                            "basicCard": {
+                            
+                            "description": "등록되지 않은 사용자입니다. ID등록 후 이용해주시기 바랍니다.",
+                            "buttons": [
+                                {
+                                "action": "block",
+                                "label": "등록하기",
+                                "blockId": "6072b7ac57f2de3814a5b3c1"
+                                }
+                            ]
+                            }
+                        } #for subjectN in usersubject_list                      
+                    ]
+                }
+            }
+        return jsonify(dataSend)
     usersubject_list = []
     subject_list = IDWithSubject.query.filter_by(UserID=user_id)
     for subject in subject_list:
@@ -37,60 +61,57 @@ def subjectName_home():
                 "template": {
                     "outputs": [
                         {
-                            "basicCard": {
-                            
-                            "description": f"{parm_subjectName}\n\n공지사항",
-                            "buttons": [
-                                {
-                                "action": "block",
-                                "label": "최근 공지 보기",
-                                "blockId": "60851c36021d627739d9a7ee"
-                                },
-                                {
-                                "action":  "block",
-                                "label": "키워드 검색",
-                                "blockId": "60851c3e51bb5918f5980367"
-                                }
-                            ]
-                            }
-                        }, #for i in range(3)
-                        {
-                            "basicCard": {
-                            
-                            "description": f"{parm_subjectName}\n\n과제",
-                            "buttons": [
-                                {
-                                "action": "block",
-                                "label": "진행 중인 과제",
-                                "blockId": "609559c1f1fa0324a1b160aa"
-                                },
-                                {
-                                "action":  "block",
-                                "label": "미제출 과제",
-                                "blockId": "609559d0f1a09324e4b3dcfa"
-                                }
-                            ]
-                            }
-                        },
-                        {
-                            "basicCard": {
-                            
-                            "description": f"{parm_subjectName}\n\n온라인 강의",
-                            "buttons": [
-                                {
-                                "action": "block",
-                                "label": "진행 중인 강의",
-                                "blockId": "60955e0ea0ddb07dd0ca47c4"
-                                },
-                                {
-                                "action":  "block",
-                                "label": "미시청 강의",
-                                "blockId": "6096bc0d561a027398d8a57b"
-                                }
-                            ]
-                            }
+                            "carousel":{
+                                "type" : "basicCard",
+                                "items" : [
+                                    {                            
+                                        "description": f"[{parm_subjectName}]\n\n공지사항",
+                                        "buttons": [
+                                        {
+                                            "action": "block",
+                                            "label": "최근 공지 보기",
+                                            "blockId": "60851c36021d627739d9a7ee"
+                                        },
+                                    {
+                                        "action":  "block",
+                                        "label": "키워드 검색",
+                                        "blockId": "60851c3e51bb5918f5980367"
+                                            }
+                                        ]
+                                    },
+                                    {                                                  
+                                        "description": f"[{parm_subjectName}]\n\n과제",
+                                        "buttons": [
+                                        {
+                                        "action": "block",
+                                        "label": "진행 중인 과제",
+                                        "blockId": "609559c1f1fa0324a1b160aa"
+                                        },
+                                        {
+                                        "action":  "block",
+                                        "label": "미제출 과제",
+                                        "blockId": "609559d0f1a09324e4b3dcfa"
+                                        }
+                                        ]                           
+                                    },
+                                    {
+                                        "description": f"[{parm_subjectName}]\n\n온라인 강의",
+                                        "buttons": [
+                                            {
+                                            "action": "block",
+                                            "label": "진행 중인 강의",
+                                            "blockId": "60955e0ea0ddb07dd0ca47c4"
+                                            },
+                                            {
+                                            "action":  "block",
+                                            "label": "미시청 강의",
+                                            "blockId": "6096bc0d561a027398d8a57b"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }                            
                         }
-
                     ]
                 }
             }
@@ -146,28 +167,47 @@ def subjectName_notice_recent():
         Notice.SubjectID == f"{subject_id}"
         
         )
-    ).order_by(Notice.Date.desc())[:3]
+    ).order_by(Notice.Date.desc())
     print(notice_list)
     notice_name = []
     for notice in notice_list:
         subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
-
         notice_name.append([subject_name,notice.Title,notice.Contents])
+    if len(notice_name) == 0:
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                        
+                            "text": "해당 과목의 공지사항이 존재하지 않습니다.",
+                        
+                        }
+                    }                 
+
+                ]
+            }
+        }
+        return jsonify(dataSend)
     
     dataSend = {
         "version": "2.0",
-        "template": {
-            "outputs": [
-                {
-                    "simpleText": {
-                    
-                        "text": f"{notice[1]}\n\n{notice[2]}",
-                    
+            "template": {
+                "outputs": [
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items" : [
+                                {
+                                    #"title" : notice[1],
+                                    "description": f"{notice[1]}\n\n{notice[2]}"
+                                } for notice in notice_name                                      
+                            ]
+                        }                            
                     }
-                } for notice in notice_name                
-
-            ]
-        }
+                ]
+            }
     }
 
     return jsonify(dataSend)
@@ -193,6 +233,7 @@ def subjectName_notice_keyword():
 
     notice_list = Notice.query.filter_by(SubjectID=subject_id)
     notice_name = [] 
+    
     for notice in notice_list:
         print(notice)
              
@@ -200,64 +241,45 @@ def subjectName_notice_keyword():
             
             subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
             notice_name.append([subject_name,notice.Title,notice.Contents])
-
     
-    dataSend = {
-        "version": "2.0",
-        "template": {
-            "outputs": [
-                {
-                    "simpleText": {
-                    
-                        "text": f"{notice[1]}\n\n{notice[2]}",
-                    
-                    }
-                } for notice in notice_name                
-
-            ]
-        }
-    }
-
-    return jsonify(dataSend)
-
-@bp.route('/subject', methods=['POST'])
-def register_subject():
-    content = request.get_json()
-    print(content)
-    kakaoid = content['userRequest']['user']['id']
-    
-    
-    dataSend = {
+    if len(notice_name) == 0:
+        dataSend = {
             "version": "2.0",
             "template": {
                 "outputs": [
                     {
-                        "basicCard": {
-        #   "title": "보물상자",
-          "description": "등록이 성공적으로 완료되었습니다.\n\n메뉴를 선택해주세요",
-          "buttons": [
-            {
-              "action": "message",
-              "label": "내 현황 보기",
-              "messageText": "아직 블록 연결 안함"
-            },
-            {
-              "action":  "message",
-              "label": "과목 별 확인",
-              "messageText": "아직 블록 연결 안함"
-            },
-            {
-              "action": "message",
-              "label": "홈페이지 공지사항",
-              "messageText": "아직 블록 연결 안함"
-            },
-          ]
-        }
-                    }
+                        "simpleText": {
+                        
+                            "text": f"'{parm_keyword}'에 대한 검색 결과가 없습니다.",
+                        
+                        }
+                    }                 
+
                 ]
             }
         }
+        return jsonify(dataSend)
+    dataSend = {
+        "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items" : [
+                                {
+                                    #"title" : notice[1],
+                                    "description": f"{notice[1]}\n\n{notice[2]}"
+                                } for notice in notice_name                                      
+                            ]
+                        }                            
+                    }
+                ]
+            }
+    }
+
     return jsonify(dataSend)
+
 
 @bp.route('/assignment_inprogress', methods=['POST'])
 def subjectName_assignment_inprogress():
@@ -279,43 +301,253 @@ def subjectName_assignment_inprogress():
     subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
 
     assignment_list = Assignment.query.filter_by(UserID=user_id,SubjectID=subject_id)
-
+    assignment_name = []
     for assignment in assignment_list:
         #print(notice)      
-        
         if assignment.StartDate <= datetime.now() and assignment.EndDate >= datetime.now():
+            if assignment.Submit == True:
+                state = "제출"
+            else:
+                state = "미제출"
+            assignment_name.append([assignment.Title,assignment.StartDate.strftime("%Y-%m-%d %H:%M:%S"),assignment.EndDate.strftime("%Y-%m-%d %H:%M:%S"),state])
             print(assignment.StartDate,assignment.EndDate,datetime.now())    
 
-    
-    # dataSend = {
-    #     "version": "2.0",
-    #     "template": {
-    #         "outputs": [
-    #             {
-    #                 "simpleText": {
-                    
-    #                     "text": f"{notice[1]}\n\n{notice[2]}",
-                    
-    #                 }
-    #             } for notice in notice_name                
+    if len(assignment_name) == 0:
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                        
+                            "text": "진행 중인 과제가 존재하지 않습니다.",
+                        
+                        }
+                    }                 
 
-    #         ]
-    #     }
-    # }
+                ]
+            }
+        }
+        return jsonify(dataSend)
+    
     dataSend = {
         "version": "2.0",
-        "template": {
-            "outputs": [
-                {
-                    "simpleText": {
-                    
-                        "text": "test",
-                    
+            "template": {
+                "outputs": [
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items" : [
+                                {
+                                    
+                                    "description": f"{assignment[0]}\n\n제출기한: {assignment[1]} ~ {assignment[2]}\n\n상태: {assignment[3]}"
+                                } for assignment in assignment_name                                      
+                            ]
+                        }                            
                     }
-                }                 
-
-            ]
-        }
+                ]
+            }
     }
 
     return jsonify(dataSend)
+
+@bp.route('/assignment_incomplete', methods=['POST'])
+def subjectName_assignment_incomplete():
+    content = request.get_json()
+    print(content)
+    kakaoid = content['userRequest']['user']['id']
+    
+    content = content['action']
+    content = content['params']
+    parm_subjectName = content['subjectName']
+    
+    
+    user = User.query.filter_by(UserKey=kakaoid).first()
+
+    if not user:
+        return -1
+    user_id = user.ID
+    
+    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+
+    assignment_list = Assignment.query.filter_by(UserID=user_id,SubjectID=subject_id)
+    assignment_name = []
+    for assignment in assignment_list:
+        #print(notice)      
+        if assignment.StartDate <= datetime.now() and assignment.EndDate >= datetime.now():
+            if assignment.Submit == False:
+                state = "미제출"
+                assignment_name.append([assignment.Title,assignment.StartDate.strftime("%Y-%m-%d %H:%M:%S"),assignment.EndDate.strftime("%Y-%m-%d %H:%M:%S"),state])
+                print(assignment.StartDate,assignment.EndDate,datetime.now())    
+
+    if len(assignment_name) == 0:
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                        
+                            "text": "미제출 과제가 존재하지 않습니다.",
+                        
+                        }
+                    }                 
+
+                ]
+            }
+        }
+        return jsonify(dataSend)
+    
+    dataSend = {
+        "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items" : [
+                                {
+                                    
+                                    "description": f"{assignment[0]}\n\n제출기한: {assignment[1]} ~ {assignment[2]}\n\n상태: {assignment[3]}"
+                                } for assignment in assignment_name                                      
+                            ]
+                        }                            
+                    }
+                ]
+            }
+    }
+
+    return jsonify(dataSend)
+
+@bp.route('/online_inprogress', methods=['POST'])
+def subjectName_online_inprogress():
+    content = request.get_json()
+    print(content)
+    kakaoid = content['userRequest']['user']['id']
+    
+    content = content['action']
+    content = content['params']
+    parm_subjectName = content['subjectName']
+    
+    
+    user = User.query.filter_by(UserKey=kakaoid).first()
+
+    if not user:
+        return -1
+    user_id = user.ID
+    
+    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+
+    online_list = OnlineLecture.query.filter_by(UserID=user_id,SubjectID=subject_id)
+    online_name = []
+    for online in online_list:
+        #print(notice)      
+        if online.StartDate <= datetime.now() and online.EndDate >= datetime.now():
+            online_name.append([online.Title,online.Contents,online.StartDate.strftime("%Y-%m-%d %H:%M:%S"),online.EndDate.strftime("%Y-%m-%d %H:%M:%S"),online.Progress])
+            
+    if len(online_name) == 0:
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                        
+                            "text": "진행중인 온라인 강의가 존재하지 않습니다.",
+                        
+                        }
+                    }                 
+
+                ]
+            }
+        }
+        return jsonify(dataSend)
+    
+    dataSend = {
+        "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items" : [
+                                {
+                                    
+                                    "description": f"제목: {online[0]}\n\n학습목차: {online[1]}\n\n학습기간: {online[2]} ~ {online[3]}\n\n진도율: {online[4]}"
+                                } for online in online_name                                      
+                            ]
+                        }                            
+                    }
+                ]
+            }
+    }
+
+    return jsonify(dataSend)
+
+@bp.route('/online_incomplete', methods=['POST'])
+def subjectName_online_incomplete():
+    content = request.get_json()
+    print(content)
+    kakaoid = content['userRequest']['user']['id']
+    
+    content = content['action']
+    content = content['params']
+    parm_subjectName = content['subjectName']
+    
+    
+    user = User.query.filter_by(UserKey=kakaoid).first()
+
+    if not user:
+        return -1
+    user_id = user.ID
+    
+    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+
+    online_list = OnlineLecture.query.filter_by(UserID=user_id,SubjectID=subject_id)
+    online_name = []
+    for online in online_list:
+        #print(notice)      
+        if online.StartDate <= datetime.now() and online.EndDate >= datetime.now():
+            if online.Progress[1:4] !="100":
+                online_name.append([online.Title,online.Contents,online.StartDate.strftime("%Y-%m-%d %H:%M:%S"),online.EndDate.strftime("%Y-%m-%d %H:%M:%S"),online.Progress])
+            
+    if len(online_name) == 0:
+        dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "simpleText": {
+                        
+                            "text": "모든 강의를 시청하셨습니다.",
+                        
+                        }
+                    }                 
+
+                ]
+            }
+        }
+        return jsonify(dataSend)
+    
+    dataSend = {
+        "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                        "carousel":{
+                            "type" : "basicCard",
+                            "items" : [
+                                {
+                                    
+                                    "description": f"제목: {online[0]}\n\n학습목차: {online[1]}\n\n학습기간: {online[2]} ~ {online[3]}\n\n진도율: {online[4]}"
+                                } for online in online_name                                      
+                            ]
+                        }                            
+                    }
+                ]
+            }
+    }
+
+    return jsonify(dataSend)
+
+    

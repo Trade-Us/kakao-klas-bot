@@ -160,5 +160,3 @@ def register_user(parm_id, name, parm_password, kakaoid):
         return -1, dataSend
 
     # 실패시 오류 처리
-_, v = register_user("2018203092", "df", "tkddlf^^12", "sdf")
-print(v)

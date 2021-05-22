@@ -78,6 +78,7 @@ def add_Assignment(userID, lists):
         subjectID = data[7]
         # split date into startdate and enddate
         date = data[2] if data[6] == '-' else data[6]
+        date = date.split('~')
         startDate = datetime.strptime(date[0].strip(), '%Y-%m-%d %H:%M:%S')
         endDate = datetime.strptime(date[1].strip(), '%Y-%m-%d %H:%M:%S')
         
