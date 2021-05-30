@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from server.models import User, IDWithSubject, Subject, Assignment, Notice, OnlineLecture
+from server.models import User, IDWithSubject, Subject, Assignment, Notice, OnlineLecture,NewUser
 #from server import db
 #from server.models import Notice
 from database import db_session
@@ -20,6 +20,7 @@ def subjectName_home():
     content = content['action']
     content = content['params']
     parm_subjectName = content['subjectName']
+    i=0
     count = 0
     user_list = User.query.filter_by(UserKey=kakaoid)
     
@@ -29,7 +30,9 @@ def subjectName_home():
         user_id = user.ID
         count +=1
     if count == 0:
-        dataSend = {
+        nuser = NewUser.query.filter_by(UserKey=kakaoid).first()
+        if not nuser:
+            dataSend = {
                 "version": "2.0",
                 "template": {
                     "outputs": [
@@ -49,12 +52,31 @@ def subjectName_home():
                     ]
                 }
             }
+        else:
+            dataSend = {
+            "version": "2.0",
+            "template": {
+                "outputs": [
+                    {
+                    
+                        "simpleText": {
+                        
+                            "text": "등록이 진행중입니다. 잠시만 기다려주세요"
+                        
+                        }
+                    
+                    }
+                ]
+            }
+            }
+        
         return jsonify(dataSend)
     usersubject_list = []
     subject_list = IDWithSubject.query.filter_by(UserID=user_id)
     for subject in subject_list:
         usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
-    
+    numbers = list(range(1,len(usersubject_list)+1))
+    print(numbers)
     if parm_subjectName in usersubject_list:
         dataSend = {
                 "version": "2.0",
@@ -116,10 +138,73 @@ def subjectName_home():
                 }
             }
         return jsonify(dataSend)
+    elif parm_subjectName in [str(num) for num in numbers]:
+        dataSend = {
+                "version": "2.0",
+                "template": {
+                    "outputs": [
+                        {
+                            "carousel":{
+                                "type" : "basicCard",
+                                "items" : [
+                                    {                            
+                                        "description": f"[{usersubject_list[int(parm_subjectName)-1]}]\n\n공지사항",
+                                        "buttons": [
+                                        {
+                                            "action": "block",
+                                            "label": "최근 공지 보기",
+                                            "blockId": "60851c36021d627739d9a7ee"
+                                        },
+                                    {
+                                        "action":  "block",
+                                        "label": "키워드 검색",
+                                        "blockId": "60851c3e51bb5918f5980367"
+                                            }
+                                        ]
+                                    },
+                                    {                                                  
+                                        "description": f"[{usersubject_list[int(parm_subjectName)-1]}]\n\n과제",
+                                        "buttons": [
+                                        {
+                                        "action": "block",
+                                        "label": "진행 중인 과제",
+                                        "blockId": "609559c1f1fa0324a1b160aa"
+                                        },
+                                        {
+                                        "action":  "block",
+                                        "label": "미제출 과제",
+                                        "blockId": "609559d0f1a09324e4b3dcfa"
+                                        }
+                                        ]                           
+                                    },
+                                    {
+                                        "description": f"[{usersubject_list[int(parm_subjectName)-1]}]\n\n온라인 강의",
+                                        "buttons": [
+                                            {
+                                            "action": "block",
+                                            "label": "진행 중인 강의",
+                                            "blockId": "60955e0ea0ddb07dd0ca47c4"
+                                            },
+                                            {
+                                            "action":  "block",
+                                            "label": "미시청 강의",
+                                            "blockId": "6096bc0d561a027398d8a57b"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }                            
+                        }
+                    ]
+                }
+            }
+        return jsonify(dataSend)
+
     else:
         des=""
         for sub in usersubject_list:
-            des+=sub
+            i+=1
+            des+=str(i)+". "+sub
             des+="\n\n"
 
         dataSend = {
@@ -129,7 +214,7 @@ def subjectName_home():
                         {
                             "basicCard": {
                             
-                            "description": f"이 중 하나를 정확하게 입력해주세요.\n\n{des}",
+                            "description": f"이 중 하나를 정확하게 입력해주세요.\n\n(과목이름 또는 번호 입력 가능)\n\n{des}",
                             "buttons": [
                                 {
                                 "action": "block",
@@ -160,7 +245,18 @@ def subjectName_notice_recent():
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #####
+    usersubject_list = []
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id)
+    for subject in subject_list:
+        usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
+    numbers = list(range(1,len(usersubject_list)+1))
+    #####
+
+    if parm_subjectName in usersubject_list:
+        subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    elif parm_subjectName in [str(num) for num in numbers]:
+        subject_id = Subject.query.filter_by(Name=usersubject_list[int(parm_subjectName)-1]).first().ID
     #subject_list = IDWithSubject.query.filter_by(SubjectID=subject_id).all()
     print("\nlog:",subject_id)
     notice_list = Notice.query.filter(or_(
@@ -229,7 +325,17 @@ def subjectName_notice_keyword():
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #####
+    usersubject_list = []
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id)
+    for subject in subject_list:
+        usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
+    numbers = list(range(1,len(usersubject_list)+1))
+    #####
+    if parm_subjectName in usersubject_list:
+        subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    elif parm_subjectName in [str(num) for num in numbers]:
+        subject_id = Subject.query.filter_by(Name=usersubject_list[int(parm_subjectName)-1]).first().ID
 
     notice_list = Notice.query.filter_by(SubjectID=subject_id)
     notice_name = [] 
@@ -298,7 +404,17 @@ def subjectName_assignment_inprogress():
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #####
+    usersubject_list = []
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id)
+    for subject in subject_list:
+        usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
+    numbers = list(range(1,len(usersubject_list)+1))
+    #####
+    if parm_subjectName in usersubject_list:
+        subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    elif parm_subjectName in [str(num) for num in numbers]:
+        subject_id = Subject.query.filter_by(Name=usersubject_list[int(parm_subjectName)-1]).first().ID
 
     assignment_list = Assignment.query.filter_by(UserID=user_id,SubjectID=subject_id)
     assignment_name = []
@@ -368,7 +484,17 @@ def subjectName_assignment_incomplete():
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #####
+    usersubject_list = []
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id)
+    for subject in subject_list:
+        usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
+    numbers = list(range(1,len(usersubject_list)+1))
+    #####
+    if parm_subjectName in usersubject_list:
+        subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    elif parm_subjectName in [str(num) for num in numbers]:
+        subject_id = Subject.query.filter_by(Name=usersubject_list[int(parm_subjectName)-1]).first().ID
 
     assignment_list = Assignment.query.filter_by(UserID=user_id,SubjectID=subject_id)
     assignment_name = []
@@ -436,7 +562,17 @@ def subjectName_online_inprogress():
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #####
+    usersubject_list = []
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id)
+    for subject in subject_list:
+        usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
+    numbers = list(range(1,len(usersubject_list)+1))
+    #####
+    if parm_subjectName in usersubject_list:
+        subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    elif parm_subjectName in [str(num) for num in numbers]:
+        subject_id = Subject.query.filter_by(Name=usersubject_list[int(parm_subjectName)-1]).first().ID
 
     online_list = OnlineLecture.query.filter_by(UserID=user_id,SubjectID=subject_id)
     online_name = []
@@ -501,7 +637,17 @@ def subjectName_online_incomplete():
         return -1
     user_id = user.ID
     
-    subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    #####
+    usersubject_list = []
+    subject_list = IDWithSubject.query.filter_by(UserID=user_id)
+    for subject in subject_list:
+        usersubject_list.append(Subject.query.filter_by(ID=subject.SubjectID).first().Name)
+    numbers = list(range(1,len(usersubject_list)+1))
+    #####
+    if parm_subjectName in usersubject_list:
+        subject_id = Subject.query.filter_by(Name=parm_subjectName).first().ID
+    elif parm_subjectName in [str(num) for num in numbers]:
+        subject_id = Subject.query.filter_by(Name=usersubject_list[int(parm_subjectName)-1]).first().ID
 
     online_list = OnlineLecture.query.filter_by(UserID=user_id,SubjectID=subject_id)
     online_name = []

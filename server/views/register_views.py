@@ -44,9 +44,9 @@ def register_home():
                         "description": "등록이 성공적으로 완료되었습니다.\n\n메뉴를 선택해주세요",
                         "buttons": [
                             {
-                            "action": "message",
+                            "action": "block",
                             "label": "내 현황 보기",
-                            "messageText": "아직 블록 연결 안함"
+                            "blockId": "6082bcab51bb5918f598014e"
                             },
                             {
                             "action":  "block",
@@ -54,9 +54,9 @@ def register_home():
                             "blockId": "6087e7fdc87b900e56c62ba6"
                             },
                             {
-                            "action": "message",
-                            "label": "홈페이지 공지사항",
-                            "messageText": "아직 블록 연결 안함"
+                            "action": "webLinkUrl",
+                            "label": "광운대학교 홈페이지",
+                            "webLinkUrl": "www.kw.ac.kr"
                             }
                         ]
                         }
