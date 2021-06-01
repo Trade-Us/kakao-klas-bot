@@ -14,7 +14,7 @@ from register import register_user
 @bp.route('/',methods=['POST'])
 def register_home():
     content = request.get_json()
-    print(content)
+    # print(content)
     kakaoid = content['userRequest']['user']['id']
     
     content = content['action']
@@ -22,7 +22,7 @@ def register_home():
     parm_id = content['id']
     parm_password = content['password']
     name = "모상일"
-    print(parm_id,name,parm_password, kakaoid)
+    # print(parm_id,name,parm_password, kakaoid)
     ### MSI REVISE ###
     # 등록
     ## 해당 봇 key 가입 여부 확인
@@ -54,7 +54,7 @@ def register_home():
                             "blockId": "6087e7fdc87b900e56c62ba6"
                             },
                             {
-                            "action": "webLinkUrl",
+                            "action": "webLink",
                             "label": "광운대학교 홈페이지",
                             "webLinkUrl": "www.kw.ac.kr"
                             }

@@ -72,10 +72,10 @@ def register_user(parm_id, name, parm_password, kakaoid):
                 myThreadDriver.driver.page_source, 'html.parser')
             subjects = soup.select(
                 "#appModule > div > div:nth-child(1) > div:nth-child(2) > ul > li")
-            print('pass')
+            #print('pass')
         start = time.time()
         while not subjects:
-            if time.time() - start >= 1.2:
+            if time.time() - start >= 1.5:
                 # 여기서 1.5는 로그인 되기까지 1.5초 기다리겠다는 의미임. 따라서,
                 # 만약에 id,pw 잘 입력했는데 로그인 실패가 뜨면 1.5보다 크게 하고 (2보다 작게)
                 # id,pw 잘못 입력한 경우, 응답시간 초과가 되면 1.5보다 작게 (1보다 크게)
