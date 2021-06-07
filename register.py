@@ -71,7 +71,7 @@ def register_user(parm_id, name, parm_password, kakaoid):
             soup = BeautifulSoup(
                 myThreadDriver.driver.page_source, 'html.parser')
             subjects = soup.select(
-                "#appModule > div > div:nth-child(1) > div:nth-child(2) > ul > li")
+                "#appModule > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li")
             #print('pass')
         start = time.time()
         while not subjects:

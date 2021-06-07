@@ -86,7 +86,7 @@ class MyThreadDriver(threading.Thread):
 
     def _access_to_certain_page(self, tuple):
         self.driver\
-            .find_element_by_css_selector(f'#navbarHeader > div > div > div:nth-child({tuple[0]}) > ul > li:nth-child({tuple[1]}) > ul > li:nth-child({tuple[2]}) > a').click()
+            .find_element_by_css_selector(f'#navbarHeader > div > div > div:nth-of-type({tuple[0]}) > ul > li:nth-of-type({tuple[1]}) > ul > li:nth-of-type({tuple[2]}) > a').click()
         WebDriverWait(self.driver, self.delay).until(
             EC.presence_of_element_located((By.NAME, "selectSubj")))
 

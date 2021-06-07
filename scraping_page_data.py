@@ -19,7 +19,7 @@ def crawl_detail_notice(source, info):
     for entity in [title, writer, date, contents]:
         info.append(entity)
     # 이전 글 존재 여부 체크
-    prev_notice = soup.select_one("#appModule > div.next_prev_box > dl:nth-child(1) > dd")
+    prev_notice = soup.select_one("#appModule > div.next_prev_box > dl:nth-of-type(1) > dd")
     print(prev_notice.text)
     return True if prev_notice.text.strip() == "이전글이 없습니다." else False 
 
@@ -32,7 +32,7 @@ def crawling_notice(driver, sub_id, notice):
     start_crawl_notice = ''
     # 중요 표시 확인 로직
     for i in range(len(notices)):
-        star_notice = driver.find_elements_by_css_selector(f"#appModule > table > tbody > tr:nth-child({(i+1)}) > td")
+        star_notice = driver.find_elements_by_css_selector(f"#appModule > table > tbody > tr:nth-of-type({(i+1)}) > td")
         no_star = star_notice[0].text
         link = star_notice[1]
         if no_star :
@@ -63,7 +63,7 @@ def crawling_notice(driver, sub_id, notice):
         if prev_page_not_exist:
             # 이전 페이지 없음  
             break 
-        driver.find_element_by_css_selector("#appModule > div.next_prev_box > dl:nth-child(1) > dd").click()
+        driver.find_element_by_css_selector("#appModule > div.next_prev_box > dl:nth-of-type(1) > dd").click()
         time.sleep(0.5)
         
 ##### Crawling Online Lectures Functions #####
@@ -71,7 +71,7 @@ def crawling_notice(driver, sub_id, notice):
 def crawling_online_lecture(page_source, sub_id, online_lecture):
     soup = BeautifulSoup(page_source, 'html.parser')
     datas = soup.select(
-        "#appModule > div:nth-child(2) > div.mt-4.mb-4 > div.tablelistbox > table > tbody > tr")[1:]
+        "#appModule > div:nth-of-type(2) > div.mt-4.mb-4 > div.tablelistbox > table > tbody > tr")[1:]
 
     for data in datas:
         info = []
