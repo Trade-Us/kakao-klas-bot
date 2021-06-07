@@ -37,6 +37,7 @@ def crawling_notice(driver, sub_id, notice):
         link = star_notice[1]
         if no_star :
             # 중요 표시 아닌 경우, 그만
+            print(link)
             start_crawl_notice = link # 중요 표시 그 다음 notice를 저장
             break
         else:
@@ -78,8 +79,9 @@ def crawling_online_lecture(page_source, sub_id, online_lecture):
         titles = data.select("td")
         for title in titles:
             if title.text == "등록된 온라인강의가 없습니다.":
-                return
+                return            
             info.append(title.text.strip())
+        print(titles[3].text)
         info.append(sub_id)
         online_lecture.append(info)
 ##### Crawling Assignments Functions #####
@@ -92,15 +94,16 @@ def crawling_assignments(page_source, sub_id, assignment):
     for i, data in enumerate(datas):
         titles = data.select('td')
         if i % 2 == 0:
-            info.clear()
             for title in titles:
                 if title.text == "출제된 레포트가 없습니다.":
                     return
                 info.append(title.text)
+            print(titles[1].text)
         else:
             info.append(titles[0].text)
             info.append(sub_id)
             assignment.append(info)
+            info = []
 
         
 ##### Crawling Lecture Papers Functions #####

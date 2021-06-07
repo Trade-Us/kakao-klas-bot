@@ -35,11 +35,12 @@ def cur_user_update():
     if infoList:
         execute_crawl(infoList)
     period=3600
-    timer = threading.Timer(3600, cur_user_update)
+    timer = threading.Timer(period, cur_user_update)
     timer.daemon = True
     timer.start()
             
 def new_user_create():
+    print("NEW User Updating 실행")
     ##### While 무한 루프 돌린다. #####
     infoList = read_NewUser()
     if infoList:
@@ -48,16 +49,18 @@ def new_user_create():
         delete_NewUser(infoList)
         ## User에 추가
         add_User(infoList)
-
+    period=10
+    timer = threading.Timer(period, new_user_create)
+    timer.daemon = True
+    timer.start()
 if __name__ == "__main__":
-    cur_user_update()
     try:
-        period=10
-        while True:
-            new_user_create()
-            time.sleep(period)
+        cur_user_update()
+        new_user_create()
     except KeyboardInterrupt:
         print("Keyborad Interrupt")
         exit(-1)
+    while(True):
+        pass
 
         

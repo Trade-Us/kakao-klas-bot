@@ -14,6 +14,7 @@ from register import register_user
 @bp.route('/',methods=['POST'])
 def register_home():
     content = request.get_json()
+    print(content)
     # print(content)
     kakaoid = content['userRequest']['user']['id']
     

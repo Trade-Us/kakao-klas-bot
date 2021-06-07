@@ -7,7 +7,7 @@ def add_IDWithSubject(lists):
     data = IDWithSubject(crawling[0], crawling[1])
     db_session.add(data)
     db_session.commit()
-
+    db_session.close()
 
 def delete_IDWithSubject(userID, subjectID):
     pass
@@ -25,6 +25,7 @@ def add_User(lists):
             user = User(_id, name, password, kakaoid)
             db_session.add(user)
             db_session.commit()
+    db_session.close()
 
 
 def delete_User(ID):
@@ -35,6 +36,7 @@ def delete_User(ID):
         for _id in ID:
             db_session.query(User).filter_by(ID=_id[0]).delete()
             db_session.commit()
+    db_session.close()
 
 def add_NewUser(lists):
     for data in lists:
@@ -48,7 +50,7 @@ def add_NewUser(lists):
             user = NewUser(_id, name, password, kakaoid)
             db_session.add(user)
             db_session.commit()
-
+    db_session.close()
 
 def delete_NewUser(ID):
     if ID == "all":
@@ -59,12 +61,13 @@ def delete_NewUser(ID):
             db_session.query(NewUser).filter_by(ID=_id[0]).delete()
             db_session.commit()
         
+    db_session.close()
 
 def add_Subject(name, professor, schedule):
     data = Subject(name, professor, schedule)
     db_session.add(data)
     db_session.commit()
-
+    db_session.close()
 
 def delete_Subject(name, professor, schedule):
     pass
@@ -92,7 +95,7 @@ def add_Assignment(userID, lists):
             assignment.StartDate = startDate
             assignment.EndDate = endDate
         db_session.commit()
-
+    db_session.close()
 def delete_Assignment(title, startDate, endDate, submit, subjectID):
     pass
     # 항목: '번호', '제목', '파일', '작성자', '작성일', '조회수'
@@ -114,7 +117,7 @@ def add_Notice(lists):
             notice.Title = title
             notice.Contents = contents
         db_session.commit()
-
+    db_session.close()
 def delete_Notice(title, writer, date, contents, serialNum, subjectID):
     pass
     # 항목: '주차', '회수', '제목', '목차', '학습기간', '[진도율]학습시간', '강의보기'
@@ -140,6 +143,6 @@ def add_OnlineLecture(userID, lists):
         else:
             onlineLecture.Progress = progress
         db_session.commit()
-
+    db_session.close()
 def delete_OnlineLecture(startDate, endDate, progress, contents, week, episode, subjectID):
     pass

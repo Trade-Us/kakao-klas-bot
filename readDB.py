@@ -7,7 +7,7 @@ def read_User():
     for user in users:
         user_set=[user.ID, user.Name, user.Password, user.UserKey]
         user_lists.append(user_set)
-
+    db_session.close()
     return user_lists
 
 def read_NewUser():
@@ -16,5 +16,5 @@ def read_NewUser():
     for user in users:
         user_set=[user.ID, user.Name, user.Password, user.UserKey]
         user_lists.append(user_set)
-
+    db_session.close()
     return user_lists

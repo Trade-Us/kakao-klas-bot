@@ -5,6 +5,8 @@ from server.models import User, IDWithSubject, Subject, Assignment, Notice, Onli
 from database import db_session
 from sqlalchemy import and_, or_
 from datetime import datetime, timedelta
+from Extractor import *
+
 bp = Blueprint('subjectName', __name__, url_prefix='/subjectName')
 
 ### MSI REVISE ###
@@ -266,9 +268,12 @@ def subjectName_notice_recent():
     ).order_by(Notice.Date.desc())
     print(notice_list)
     notice_name = []
-    for notice in notice_list:
+    for i,notice in enumerate(notice_list):
         subject_name = Subject.query.filter_by(ID=notice.SubjectID).first().Name
+        #save_txt(notice.Contents,i)
+        #imgaePath,keywords = extractor(notice.Contents) 
         notice_name.append([subject_name,notice.Title,notice.Contents])
+        
     if len(notice_name) == 0:
         dataSend = {
             "version": "2.0",
@@ -695,5 +700,6 @@ def subjectName_online_incomplete():
     }
 
     return jsonify(dataSend)
+
 
     
