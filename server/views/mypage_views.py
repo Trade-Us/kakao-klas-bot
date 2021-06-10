@@ -66,7 +66,7 @@ def mypage_home():
     for subject in subject_list:
         assignCount = 0
         onlineCount = 0
-        onlinestr = "\n\n\n강의"
+        onlinestr = "\n\n\n온라인 강의"
         assignstr = "\n\n\n과제"
         assignment_list = Assignment.query.filter_by(UserID=user_id,SubjectID=subject.SubjectID)
         for assignment in assignment_list:      
@@ -76,13 +76,18 @@ def mypage_home():
                 else:
                     state = "미제출"
                 assignCount += 1
-                assignstr += f"\n\n{str(assignCount)}. {assignment.Title} : {state}\n마감날짜:{assignment.EndDate}"               
+                assignstr += f"\n\n{str(assignCount)}. {assignment.Title} : {state}\n마감날짜:{assignment.EndDate}"   
+        if assignCount == 0:
+            assignstr +="\n\n진행중인 과제가 존재하지 않습니다."
+            
         online_list = OnlineLecture.query.filter_by(UserID=user_id,SubjectID=subject.SubjectID)
         for online in online_list:
             if online.StartDate <= datetime.now() and online.EndDate >= datetime.now():
                 onlineCount += 1
                 onlinestr += f"\n\n{str(onlineCount)}. {online.Contents} : {online.Progress}\n마감날짜:{online.EndDate}"
         print(subject.SubjectID,assignCount,onlineCount)
+        if onlineCount == 0:
+            onlinestr +="\n\n진행중인 온라인 강의가 존재하지 않습니다."
         if assignCount > 0 or onlineCount >0:
             #mypage_list.append([Subject.query.filter_by(ID=subject.SubjectID).first().Name,onlinestr,assignstr])
             text += "\n"+Subject.query.filter_by(ID=subject.SubjectID).first().Name
