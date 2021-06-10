@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-import threading
+import threading, time
 
 from scraping_page_data import crawling_functions
 # 테스트 단계에서는, 아이디 등록후, 최근 10개에 대한 정보로 진행하도록 하자
@@ -16,7 +16,7 @@ class MyThreadDriver(threading.Thread):
     def __init__(self, _id, _pw, crawling_page_function):
         threading.Thread.__init__(self)
         options = webdriver.ChromeOptions()
-        options.add_argument("headless")
+        # options.add_argument("headless")
         options.add_argument("disable-gpu")
         # options.add_argument("disable-infobars")
         options.add_argument("no-sandbox")
@@ -72,15 +72,15 @@ class MyThreadDriver(threading.Thread):
         elemPW.send_keys(self.pw)
         elemPW.send_keys(Keys.ENTER)
         self.printLog("로그인 완료...")
-        # try:
-        # WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.CLASS_NAME, "toplogo")))
-        # except :
-        #     return False
-        # else :
-        #     return True
+        try:
+            WebDriverWait(self.driver, self.delay).until(EC.element_to_be_clickable((By.CLASS_NAME, "toplogo")))
+        except :
+            return False
+        return True
 
     ##### Menu Button 접근 및 카테고리 페이지 이동 함수 #####
     def _click_menu_btn(self):
+        time.sleep(3)
         self.driver.find_element_by_css_selector(
             'div.toplogo > button').click()
 

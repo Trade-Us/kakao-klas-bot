@@ -61,30 +61,10 @@ def register_user(parm_id, name, parm_password, kakaoid):
         # 로그인 시도 (일단 무조건 성공)
         myThreadDriver = MyThreadDriver(parm_id, parm_password, None)
         myThreadDriver.driver.get('https://klas.kw.ac.kr/')
-        myThreadDriver.accessToLogin()
+        login_check = myThreadDriver.accessToLogin()
         # 성공시 register
-        # time.sleep(1)
-        subjects = []
-
-        def check_login_valid():
-            nonlocal subjects
-            soup = BeautifulSoup(
-                myThreadDriver.driver.page_source, 'html.parser')
-            subjects = soup.select(
-                "#appModule > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li")
-            #print('pass')
-        start = time.time()
-        while not subjects:
-            if time.time() - start >= 1.5:
-                # 여기서 1.5는 로그인 되기까지 1.5초 기다리겠다는 의미임. 따라서,
-                # 만약에 id,pw 잘 입력했는데 로그인 실패가 뜨면 1.5보다 크게 하고 (2보다 작게)
-                # id,pw 잘못 입력한 경우, 응답시간 초과가 되면 1.5보다 작게 (1보다 크게)
-                # 임의로 조절을 부탁합니다! (방법이 없음..ㅜㅜ)
-                break
-            check_login_valid()
-        # 실패시 succeed = false
-        print(f"#####check spent time : {(time.time()-start)} #####")
-        if not subjects:
+        
+        if not login_check:
             # 로그인 실패한 경우
             dataSend = {
                 "version": "2.0",
@@ -105,6 +85,29 @@ def register_user(parm_id, name, parm_password, kakaoid):
                 }
             }
             return -1, dataSend
+        subjects = []
+        def check_login_valid():
+            nonlocal subjects
+            soup = BeautifulSoup(
+                myThreadDriver.driver.page_source, 'html.parser')
+            subjects = soup.select(
+                "#appModule > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li")
+        #     #print('pass')
+        start = time.time()
+        while not subjects:
+            if time.time() - start >= 1.5:
+                # 여기서 1.5는 로그인 되기까지 1.5초 기다리겠다는 의미임. 따라서,
+                # 만약에 id,pw 잘 입력했는데 로그인 실패가 뜨면 1.5보다 크게 하고 (2보다 작게)
+                # id,pw 잘못 입력한 경우, 응답시간 초과가 되면 1.5보다 작게 (1보다 크게)
+                # 임의로 조절을 부탁합니다! (방법이 없음..ㅜㅜ)
+                break
+            check_login_valid()
+        # 실패시 succeed = false
+        print(f"#####check spent time : {(time.time()-start)} #####")
+        soup = BeautifulSoup(
+        myThreadDriver.driver.page_source, 'html.parser')
+        subjects = soup.select(
+            "#appModule > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li")
         # 새 유저인 경우, New_User에 등록..
         keyAgent = SymmetricKeyAgent()
         cipher_pw = keyAgent.encrypt(parm_password)
@@ -162,3 +165,4 @@ def register_user(parm_id, name, parm_password, kakaoid):
         return -1, dataSend
 
     # 실패시 오류 처리
+print(register_user("2018203092", "상일", "tkddlf^^12", "asd"))
