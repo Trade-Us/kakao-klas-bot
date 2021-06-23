@@ -47,3 +47,9 @@ class OnlineLecture(db.Model):
     Week = db.Column(db.Integer, nullable=False,primary_key=True)
     Episode = db.Column(db.Integer, nullable=False,primary_key=True)
     SubjectID = db.Column(db.String(20),db.ForeignKey('subject.ID',ondelete='CASCADE'), nullable = False,primary_key=True)
+
+class Scores(db.Model):
+    ID = db.Column(db.String(20), primary_key=True)
+    Name = db.Column(db.String(20), nullable=False)
+    SubjectName = db.Column(db.String(20), primary_key=True)
+    Score = db.Column(db.String(10), nullable=False)

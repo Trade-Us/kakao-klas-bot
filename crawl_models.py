@@ -118,3 +118,18 @@ class OnlineLecture(Base):
         self.SubjectID = SubjectID
     def __repr__(self):
         return "<OnlineLecture('%s', '%s', '%s', '%s', '%d', '%s', '%d', '%d', '%s')>" %(self.UserID, self.Title, str(self.StartDate), str(self.EndDate), self.Progress, str(self.Contents),self.Week,self.Episode,self.SubjectID)
+
+
+class Scores(Base):
+    __tablename__ = 'scores'
+    ID = Column(String(20), primary_key=True)
+    Name = Column(String(20), nullable=False)
+    SubjectName = Column(String(20), primary_key=True)
+    Score = Column(String(10), nullable=False)
+    def __init__(self, ID, Name, SubjectName, Score):
+        self.ID = ID
+        self.Name = Name
+        self.SubjectName = SubjectName
+        self.Score = Score
+    def __repr__(self):
+        return "<Scores('%s', '%s', '%s', '%s')>" %(self.ID, self.Name,self.SubjectName, self.Score)
