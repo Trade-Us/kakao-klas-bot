@@ -117,9 +117,22 @@ def crawling_attachments(page_source, sub_id, attachment):
     self.goToPrevUrl()
     # time.sleep(1)      
 
+def crawling_scores(page_source, sub_id, scores):
+    soup = BeautifulSoup(page_source, "html.parser")
+
+    datas = soup.select("#hakbu > table.AType")[0]
+    infos = datas.select("tbody > tr")
+    for data in infos:
+        result = data.text.split(' ')
+        one_result = []
+        for i in range(1, len(result), 2):
+            one_result.append(result[i])
+            # print(result[i])
+        scores.append(one_result)
 
 crawling_functions = [
     [crawling_notice, (2, 1, 2), NOTICE],
     [crawling_online_lecture, (2, 1, 1), ONLINE_LECTURE],
-    [crawling_assignments, (2, 1, 6), ASSIGNMENT]
+    [crawling_assignments, (2, 1, 6), ASSIGNMENT],
+    [crawling_scores, (1, 2, 2), SCORE_CHECK]
 ]

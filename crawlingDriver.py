@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import threading, time
 
 from scraping_page_data import crawling_functions
+from category_enum import *
 # 테스트 단계에서는, 아이디 등록후, 최근 10개에 대한 정보로 진행하도록 하자
 ## 일단 여기에 register함수도 포함해서 작성해 놓는다.
 ## 테스트 내용을 넘기고, New User에 대한 크롤링을 구현한다.
@@ -84,11 +85,14 @@ class MyThreadDriver(threading.Thread):
         self.driver.find_element_by_css_selector(
             'div.toplogo > button').click()
 
-    def _access_to_certain_page(self, tuple):
+    def _access_to_certain_page(self, tuple, category):
         self.driver\
             .find_element_by_css_selector(f'#navbarHeader > div > div > div:nth-of-type({tuple[0]}) > ul > li:nth-of-type({tuple[1]}) > ul > li:nth-of-type({tuple[2]}) > a').click()
-        WebDriverWait(self.driver, self.delay).until(
-            EC.presence_of_element_located((By.NAME, "selectSubj")))
+        
+        if category != SCORE_CHECK:
+            WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((By.NAME, "selectSubj")))
+        else:
+            time.sleep(1)
 
     ##### Page 크롤링 기능 함수 #####
     def crawling_page(self):
@@ -98,7 +102,7 @@ class MyThreadDriver(threading.Thread):
             # self.set_crawling_page_function(function[0])
 
             self._click_menu_btn()
-            self._access_to_certain_page(function[1])
+            self._access_to_certain_page(function[1], function[2])
 
             final_result = []
 

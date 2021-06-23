@@ -146,3 +146,41 @@ def add_OnlineLecture(userID, lists):
     db_session.close()
 def delete_OnlineLecture(startDate, endDate, progress, contents, week, episode, subjectID):
     pass
+
+def add_OnlineLecture(userID, lists):
+    for data in lists:
+        progress = data[5]
+        title = data[2]
+        contents = data[3]
+        week = data[0]
+        episode = data[1]
+        subjectID = data[7]
+        # split date into startdate and enddate
+        date = data[4].split('~')
+        startDate = datetime.strptime(date[0].strip(), '%Y-%m-%d %H:%M')
+        endDate = datetime.strptime(date[1].strip(), '%Y-%m-%d %H:%M')
+
+        onlineLecture = db_session.query(OnlineLecture).filter_by(UserID=userID, Week=week, Episode=episode, SubjectID=subjectID).first()
+        if not onlineLecture:
+            onlineLecture = OnlineLecture(userID,title, startDate, endDate, progress, contents, week, episode, subjectID)
+            db_session.add(onlineLecture)
+        else:
+            onlineLecture.Progress = progress
+        db_session.commit()
+    db_session.close()
+
+def add_Scores(userID, lists):
+    for data in lists:
+        _id = userID
+        name = "none"
+        subject_name = data[1]
+        real_score = data[5] if data[5] is not None else " "
+
+        score = db_session.query(Scores).filter_by(ID=_id, SubjectName=subject_name).first()
+        if not score:
+            score = Scores(_id, name, subject_name, real_score)
+            db_session.add(score)
+        else:
+            score.Scores = real_score
+        db_session.commit()
+    db_session.close()

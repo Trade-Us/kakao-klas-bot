@@ -27,6 +27,7 @@ def execute_crawl(infoList):
         add_Notice(infos[0])
         add_OnlineLecture(t.id, infos[1])
         add_Assignment(t.id, infos[2])
+        add_Scores(t.id, infos[3])
 
 def cur_user_update():
     print("Current User Updating 실행")
