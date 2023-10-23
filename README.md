@@ -6,7 +6,7 @@
 
 ## 시연 영상
 
-[![Watch the video](https://i9.ytimg.com/vi_webp/w7MVxralfwo/mq2.webp?sqp=CNT5j6kG-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFcgYShlMA8=&rs=AOn4CLB51nkPCa3tbM_ESHNs9itMKwAuEQ)](https://youtu.be/w7MVxralfwo)
+[![Watch the video](https://img.youtube.com/vi/w7MVxralfwo/0.jpg)](https://youtu.be/w7MVxralfwo)
 
 ## 주의 사항
 
